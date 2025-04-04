@@ -1,17 +1,32 @@
-import { Link } from '@tanstack/react-router'
+import { Link } from "@tanstack/react-router";
 
 export default function Header() {
+  const links = [
+    {
+      label: "Главная",
+      to: "/",
+    },
+    {
+      label: "Войти",
+      to: "/sign-in",
+    },
+    {
+      label: "Регистрация",
+      to: "/sign-up",
+    },
+  ];
+
   return (
     <header className="p-2 flex gap-2 bg-white text-black justify-between">
       <nav className="flex flex-row">
-        <div className="px-2 font-bold">
-          <Link to="/">Home</Link>
-        </div>
-
-        <div className="px-2 font-bold">
-          <Link to="/demo/tanstack-query">TanStack Query</Link>
-        </div>
+        <ul className="flex flex-row gap-2">
+          {links.map(link => (
+            <li key={link.to} className="px-2 font-bold">
+              <Link to={link.to}>{link.label}</Link>
+            </li>
+          ))}
+        </ul>
       </nav>
     </header>
-  )
+  );
 }
