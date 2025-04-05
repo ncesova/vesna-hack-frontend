@@ -11,23 +11,21 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+<<<<<<< HEAD
 import { Route as SignUpImport } from './routes/sign-up'
 import { Route as SignInImport } from './routes/sign-in'
 import { Route as ActsImport } from './routes/acts'
+=======
+import { Route as AuthImport } from './routes/auth'
+>>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
 import { Route as IndexImport } from './routes/index'
 import { Route as AnalyzeIdImport } from './routes/analyze.$id'
 
 // Create/Update Routes
 
-const SignUpRoute = SignUpImport.update({
-  id: '/sign-up',
-  path: '/sign-up',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const SignInRoute = SignInImport.update({
-  id: '/sign-in',
-  path: '/sign-in',
+const AuthRoute = AuthImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -60,6 +58,7 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+<<<<<<< HEAD
     '/acts': {
       id: '/acts'
       path: '/acts'
@@ -79,6 +78,13 @@ declare module '@tanstack/react-router' {
       path: '/sign-up'
       fullPath: '/sign-up'
       preLoaderRoute: typeof SignUpImport
+=======
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthImport
+>>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
       parentRoute: typeof rootRoute
     }
     '/analyze/$id': {
@@ -95,52 +101,84 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+<<<<<<< HEAD
   '/acts': typeof ActsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/analyze/$id': typeof AnalyzeIdRoute
+=======
+  '/auth': typeof AuthRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+>>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+<<<<<<< HEAD
   '/acts': typeof ActsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/analyze/$id': typeof AnalyzeIdRoute
+=======
+  '/auth': typeof AuthRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+>>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+<<<<<<< HEAD
   '/acts': typeof ActsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/analyze/$id': typeof AnalyzeIdRoute
+=======
+  '/auth': typeof AuthRoute
+  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+>>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
+<<<<<<< HEAD
   fullPaths: '/' | '/acts' | '/sign-in' | '/sign-up' | '/analyze/$id'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/acts' | '/sign-in' | '/sign-up' | '/analyze/$id'
   id: '__root__' | '/' | '/acts' | '/sign-in' | '/sign-up' | '/analyze/$id'
+=======
+  fullPaths: '/' | '/auth' | '/demo/tanstack-query'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/auth' | '/demo/tanstack-query'
+  id: '__root__' | '/' | '/auth' | '/demo/tanstack-query'
+>>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+<<<<<<< HEAD
   ActsRoute: typeof ActsRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   AnalyzeIdRoute: typeof AnalyzeIdRoute
+=======
+  AuthRoute: typeof AuthRoute
+  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+>>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+<<<<<<< HEAD
   ActsRoute: ActsRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   AnalyzeIdRoute: AnalyzeIdRoute,
+=======
+  AuthRoute: AuthRoute,
+  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+>>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
 }
 
 export const routeTree = rootRoute
@@ -154,15 +192,21 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+<<<<<<< HEAD
         "/acts",
         "/sign-in",
         "/sign-up",
         "/analyze/$id"
+=======
+        "/auth",
+        "/demo/tanstack-query"
+>>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
+<<<<<<< HEAD
     "/acts": {
       "filePath": "acts.tsx"
     },
@@ -171,6 +215,10 @@ export const routeTree = rootRoute
     },
     "/sign-up": {
       "filePath": "sign-up.tsx"
+=======
+    "/auth": {
+      "filePath": "auth.tsx"
+>>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
     },
     "/analyze/$id": {
       "filePath": "analyze.$id.tsx"

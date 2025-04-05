@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Некорректный email " }),
+  email: z.string().email({ message: "Некорректный email" }),
   password: z
     .string()
     .min(8, { message: "Пароль должен содержать минимум 8 символов" })
@@ -39,6 +39,7 @@ export default function SignInForm() {
     label: string;
     name: "password" | "email";
     placeholder: string;
+    type?: string;
   }
 
   const formControls: FormControl[] = [
@@ -46,36 +47,47 @@ export default function SignInForm() {
       label: "Email",
       name: "email",
       placeholder: "Введите email",
+      type: "email",
     },
     {
       label: "Пароль",
       name: "password",
       placeholder: "Введите пароль",
+      type: "password",
     },
   ];
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex flex-col gap-4">
-        {formControls.map((control: FormControl) => {
-          return (
-            <FormField
-              control={form.control}
-              name={control.name}
-              render={({ field }) => (
-                <FormItem className="mb-0">
-                  <FormLabel>{control.label}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={control.placeholder} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        })}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {formControls.map((control: FormControl, i: number) => (
+          <FormField
+            key={i}
+            control={form.control}
+            name={control.name}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-700">{control.label}</FormLabel>
+                <FormControl>
+                  <Input
+                    type={control.type}
+                    placeholder={control.placeholder}
+                    {...field}
+                    className="focus-visible:ring-blue-500"
+                  />
+                </FormControl>
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
+        ))}
 
-        <Button type="submit">Войти</Button>
+        <Button
+          type="submit"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+        >
+          Войти
+        </Button>
       </form>
     </Form>
   );

@@ -14,101 +14,100 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const formSchema = z.object({
-  username: z
-    .string()
-    .min(2, { message: "Логин должен содержать минимум 2 символа" })
-    .max(50, { message: "Логин не может быть длиннее 50 символов" }),
-  password: z
-    .string()
-    .min(8, { message: "Пароль должен содержать минимум 8 символов" })
-    .max(50, { message: "Пароль не может быть длиннее 50 символов" })
-    .regex(
-      /^(?=.*[A-Za-zа-яА-Я])(?=.*\d)(?=.*[!@#$%^&\(\)\"\'\`\=\-\_\*\+\/\?\|\^\~\<\>\[\]\{\}]).*$/,
-      {
-        message: "Пароль должен содержать хотя бы 1 букву, 1 цифру и 1 спецсимвол",
-      }
-    ),
-  email: z.string().email({ message: "Некорректный email " }),
-  confirmPassword: z.string(),
-});
+const formSchema = z
+  .object({
+    name: z.string().min(2, { message: "Имя должно содержать минимум 2 символа" }),
+    email: z.string().email({ message: "Некорректный email" }),
+    password: z
+      .string()
+      .min(8, { message: "Пароль должен содержать минимум 8 символов" })
+      .max(50, { message: "Пароль не может быть длиннее 50 символов" }),
+    confirmPassword: z.string(),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: "Пароли не совпадают",
+    path: ["confirmPassword"],
+  });
 
 export default function SignUpForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
-      password: "",
       email: "",
+      password: "",
       confirmPassword: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    if (values.password !== values.confirmPassword) {
-      form.setError("confirmPassword", {
-        message: "Пароли не совпадают",
-      });
-
-      return;
-    } else {
-      const { confirmPassword, ...rest } = values;
-
-      console.log(rest);
-    }
+    console.log(values);
   }
 
-  interface IFormControl {
+  interface FormControl {
     label: string;
-    name: "username" | "password" | "email" | "confirmPassword";
+    name: "name" | "password" | "email" | "confirmPassword";
     placeholder: string;
+    type?: string;
   }
 
-  const formControls: IFormControl[] = [
+  const formControls: FormControl[] = [
     {
-      label: "Логин",
-      name: "username",
-      placeholder: "Введите логин",
+      label: "Имя",
+      name: "name",
+      placeholder: "Введите имя",
+      type: "text",
     },
     {
       label: "Email",
       name: "email",
       placeholder: "Введите email",
+      type: "email",
     },
     {
       label: "Пароль",
       name: "password",
       placeholder: "Введите пароль",
+      type: "password",
     },
     {
       label: "Подтвердите пароль",
       name: "confirmPassword",
-      placeholder: "Введите пароль",
+      placeholder: "Повторите пароль",
+      type: "password",
     },
   ];
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex flex-col gap-4">
-        {formControls.map((control: IFormControl) => {
-          return (
-            <FormField
-              control={form.control}
-              name={control.name}
-              render={({ field }) => (
-                <FormItem className="mb-0">
-                  <FormLabel>{control.label}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={control.placeholder} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        })}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {formControls.map((control: FormControl, i: number) => (
+          <FormField
+            key={i}
+            control={form.control}
+            name={control.name}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-700">{control.label}</FormLabel>
+                <FormControl>
+                  <Input
+                    type={control.type}
+                    placeholder={control.placeholder}
+                    {...field}
+                    className="focus-visible:ring-blue-500"
+                  />
+                </FormControl>
+                <FormMessage className="text-red-500" />
+              </FormItem>
+            )}
+          />
+        ))}
 
-        <Button type="submit">Войти</Button>
+        <Button
+          type="submit"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+        >
+          Зарегистрироваться
+        </Button>
       </form>
     </Form>
   );
