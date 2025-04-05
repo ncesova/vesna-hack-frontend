@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
@@ -37,6 +38,9 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+
+// Текст технического задания
+const mockTzText = "Пример технического задания для новой системы управления данными клиентов с аутентификацией пользователей, шифрованием данных и облачным хранилищем. Система будет обрабатывать персональные данные, включая имена, адреса и платежные реквизиты.";
 
 // Демонстрационные данные
 const mockResults = [
@@ -128,21 +132,24 @@ const mockHighlights = [
     explanation:
       'Упоминание обработки персональных данных требует соответствия ФЗ-152 "О персональных данных"',
     regulation: 'ФЗ-152 "О персональных данных"',
-    color: "bg-red-100 border-red-300",
+    bgColor: "#FF000033",
+    borderColor: "#FF000080",
   },
   {
     id: "2",
     text: "шифрованием данных",
     explanation: "Использование шифрования требует соответствия Приказу ФСБ России № 378",
     regulation: "Приказ ФСБ России № 378",
-    color: "bg-amber-100 border-amber-300",
+    bgColor: "#FFA50033",
+    borderColor: "#FFA50080",
   },
   {
     id: "3",
     text: "аутентификацией пользователей",
     explanation: "Механизмы аутентификации должны соответствовать ГОСТ Р 34.10-2012",
     regulation: "ГОСТ Р 34.10-2012",
-    color: "bg-green-100 border-green-300",
+    bgColor: "#0000FF33",
+    borderColor: "#0000FF80",
   },
   {
     id: "4",
@@ -150,7 +157,8 @@ const mockHighlights = [
     explanation:
       'Использование облачных хранилищ регулируется ФЗ-149 "Об информации, информационных технологиях и о защите информации"',
     regulation: "Федеральный закон № 149-ФЗ",
-    color: "bg-blue-100 border-blue-300",
+    bgColor: "#00800033",
+    borderColor: "#00800080",
   },
 ];
 
@@ -259,26 +267,113 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
     downloadReportMutation.mutate({ id });
   };
 
-  // Функция для подсветки текста
-  const highlightText = (text: string) => {
-    let highlightedText = text;
+  // Обновленная функция рендеринга подсвеченного текста с использованием компонента Tooltip
+  const renderHighlightedText = () => {
+    // Исходный текст документа
+    const originalText = mockTzText;
 
-    // Сортируем подсветки по длине текста (от большего к меньшему),
-    // чтобы избежать проблем с вложенными подсветками
+    // Создаем массив фрагментов текста и подсветок
+    type TextFragment = {
+      type: "text" | "highlight";
+      content: string;
+      highlight?: (typeof mockHighlights)[0];
+    };
+
+    let fragments: TextFragment[] = [{ type: "text", content: originalText }];
+
+    // Сортируем подсветки по длине текста (от большего к меньшему)
     const sortedHighlights = [...mockHighlights].sort((a, b) => b.text.length - a.text.length);
 
-    for (const highlight of sortedHighlights) {
-      const parts = highlightedText.split(highlight.text);
-      highlightedText = parts.join(
-        `<span class="px-1 rounded border ${highlight.color} cursor-pointer hover:opacity-80" 
-               data-tooltip="${highlight.explanation}" 
-               data-regulation="${highlight.regulation}">
-          ${highlight.text}
-        </span>`
-      );
-    }
+    // Обрабатываем каждую подсветку
+    sortedHighlights.forEach(highlight => {
+      // Создаем новый массив фрагментов на основе существующего
+      const newFragments: TextFragment[] = [];
 
-    return highlightedText;
+      fragments.forEach(fragment => {
+        if (fragment.type === "text") {
+          // Ищем вхождения подсвечиваемого текста в текущем фрагменте
+          const parts = fragment.content.split(highlight.text);
+
+          if (parts.length > 1) {
+            // Добавляем первую часть текста
+            if (parts[0]) {
+              newFragments.push({ type: "text", content: parts[0] });
+            }
+
+            // Добавляем части текста и подсветки
+            for (let i = 1; i < parts.length; i++) {
+              // Добавляем подсветку
+              newFragments.push({
+                type: "highlight",
+                content: highlight.text,
+                highlight,
+              });
+
+              // Добавляем остаток текста, если он есть
+              if (parts[i]) {
+                newFragments.push({ type: "text", content: parts[i] });
+              }
+            }
+          } else {
+            // Если нет вхождений, добавляем исходный фрагмент без изменений
+            newFragments.push(fragment);
+          }
+        } else {
+          // Если это уже подсветка, добавляем без изменений
+          newFragments.push(fragment);
+        }
+      });
+
+      // Обновляем массив фрагментов
+      fragments = newFragments;
+    });
+
+    return (
+      <TooltipProvider delayDuration={0}>
+        <div className="p-4 bg-primary/10 rounded-md min-h-[300px]">
+          <p className="text-sm text-foreground">
+            {fragments.map((fragment, index) => {
+              if (fragment.type === "text") {
+                return <span key={index}>{fragment.content}</span>;
+              } else {
+                const { highlight } = fragment;
+                return (
+                  <Tooltip key={index}>
+                    <TooltipTrigger asChild>
+                      <span
+                        style={{
+                          backgroundColor: highlight?.bgColor,
+                          borderColor: highlight?.borderColor,
+                        }}
+                        className="px-1 rounded border cursor-pointer hover:opacity-80"
+                      >
+                        {fragment.content}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="top"
+                      align="start"
+                      className="max-w-xs z-50 bg-popover shadow-lg border border-border p-3 rounded-md"
+                      sideOffset={5}
+                    >
+                      <div className="flex flex-col gap-1">
+                        <p className="text-sm font-semibold text-primary">
+                          {highlight?.regulation}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{highlight?.explanation}</p>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              }
+            })}
+          </p>
+          <div className="mt-4 text-xs text-primary">
+            <p>* Наведите курсор на выделенный текст, чтобы увидеть пояснение</p>
+          </div>
+        </div>
+      </TooltipProvider>
+    );
   };
 
   // Replace the filter button and filter panel with dropdown menu
@@ -288,12 +383,12 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
         <Button
           variant="outline"
           size="sm"
-          className="border-green-600 text-green-700 hover:bg-green-100 flex gap-2 items-center"
+          className="border-primary text-primary hover:bg-primary/10 flex gap-2 items-center"
         >
           <Filter className="h-4 w-4" />
           Фильтр НПА
           {selectedRegulations.length > 0 && (
-            <Badge className="ml-1 bg-green-600 hover:bg-green-700">
+            <Badge className="ml-1 bg-primary hover:bg-primary/90">
               {selectedRegulations.length}
             </Badge>
           )}
@@ -324,20 +419,22 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                     }}
                   >
                     <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-4">
                         <Checkbox
                           id="select-all"
                           checked={
                             filteredRegulations.length > 0 &&
                             selectedRegulations.length === filteredRegulations.length
                           }
-                          className="border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                          className="h-5 w-5 border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                         />
                         <Label htmlFor="select-all" className="font-medium">
                           Выбрать все
                         </Label>
                       </div>
-                      <span className="text-xs text-muted-foreground">Ctrl+A</span>
+                      <span className="text-xs text-muted-foreground bg-primary/10 px-2 py-0.5 rounded">
+                        Ctrl+A
+                      </span>
                     </div>
                   </CommandItem>
 
@@ -345,7 +442,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                     variant="ghost"
                     size="sm"
                     onClick={resetFilters}
-                    className="h-8 px-2 text-sm text-green-700"
+                    className="h-8 px-2 text-sm text-primary"
                   >
                     Сбросить
                   </Button>
@@ -361,23 +458,23 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                     onSelect={() => handleFilterChange(regulation.id)}
                     className="px-2 py-1 cursor-pointer"
                   >
-                    <div className="flex items-start space-x-2 w-full">
+                    <div className="flex items-start space-x-4 w-full">
                       <Checkbox
                         id={`regulation-${regulation.id}`}
                         checked={selectedRegulations.includes(regulation.id)}
-                        className="mt-1 border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                        className="mt-1 h-5 w-5 border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
                       <div className="flex-1">
                         <Label
                           htmlFor={`regulation-${regulation.id}`}
-                          className="text-sm font-medium text-green-800"
+                          className="text-sm font-medium text-foreground"
                         >
                           {regulation.title}
                         </Label>
-                        <p className="text-xs text-green-700">{regulation.description}</p>
+                        <p className="text-xs text-primary">{regulation.description}</p>
                       </div>
                       {selectedRegulations.includes(regulation.id) && (
-                        <Check className="h-4 w-4 text-green-600" />
+                        <Check className="h-5 w-5 text-primary" />
                       )}
                     </div>
                   </CommandItem>
@@ -387,14 +484,14 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
           </CommandList>
 
           <div className="flex items-center justify-between gap-2 p-2 border-t">
-            <div className="text-xs text-muted-foreground text-green-600">
-              <kbd className="px-1 bg-green-100 rounded">↑</kbd>{" "}
-              <kbd className="px-1 bg-green-100 rounded">↓</kbd> для навигации,
-              <kbd className="ml-1 px-1 bg-green-100 rounded">Enter</kbd> для выбора
+            <div className="text-xs text-muted-foreground">
+              <kbd className="px-1 bg-muted rounded">↑</kbd>{" "}
+              <kbd className="px-1 bg-muted rounded">↓</kbd> для навигации,
+              <kbd className="ml-1 px-1 bg-muted rounded">Enter</kbd> для выбора
             </div>
             <Button
               size="sm"
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-primary hover:bg-primary/90"
               onClick={() => {
                 applyFilters();
                 setIsFilterOpen(false);
@@ -410,60 +507,45 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Link to="/" className="flex items-center text-sm mb-6 hover:underline text-green-700">
+      <Link to="/" className="flex items-center text-sm mb-6 hover:underline text-primary">
         <ArrowLeft className="mr-2 h-4 w-4" />
         Вернуться на главную
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <Card className="border-green-200 shadow-md">
-            <CardHeader className="bg-green-50 rounded-t-lg">
+          <Card className="border-primary shadow-md">
+            <CardHeader className="bg-primary/10 py-2 rounded-t-lg">
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-green-600" />
-                <CardTitle className="text-green-800">Техническое задание</CardTitle>
+                <FileText className="h-5 w-5 text-primary" />
+                <CardTitle className="text-foreground">Техническое задание</CardTitle>
               </div>
-              <CardDescription className="text-green-700">
+              <CardDescription className="text-muted-foreground">
                 Ваш загруженный документ или вставленный текст
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               {!showHighlights ? (
-                <div className="p-4 bg-green-50 rounded-md min-h-[300px]">
-                  <p className="text-sm text-green-700">
+                <div className="p-4 bg-primary/10 rounded-md min-h-[300px]">
+                  <p className="text-sm text-foreground">
                     {/* Здесь будет отображаться содержимое документа */}
-                    Пример технического задания для новой системы управления данными клиентов с
-                    аутентификацией пользователей, шифрованием данных и облачным хранилищем. Система
-                    будет обрабатывать персональные данные, включая имена, адреса и платежные
-                    реквизиты.
+                    {mockTzText}
                   </p>
                 </div>
               ) : (
-                <div className="p-4 bg-green-50 rounded-md min-h-[300px]">
-                  <p
-                    className="text-sm text-green-700"
-                    dangerouslySetInnerHTML={{
-                      __html: highlightText(
-                        "Пример технического задания для новой системы управления данными клиентов с аутентификацией пользователей, шифрованием данных и облачным хранилищем. Система будет обрабатывать персональные данные, включая имена, адреса и платежные реквизиты."
-                      ),
-                    }}
-                  />
-                  <div className="mt-4 text-xs text-green-600">
-                    <p>* Наведите курсор на выделенный текст, чтобы увидеть пояснение</p>
-                  </div>
-                </div>
+                renderHighlightedText()
               )}
 
               {!isAnalyzing && !showSummary && (
-                <Button onClick={startAnalysis} className="w-full bg-green-600 hover:bg-green-700">
+                <Button onClick={startAnalysis} className="w-full bg-primary hover:bg-primary">
                   Начать анализ
                 </Button>
               )}
 
               {isAnalyzing && (
                 <div className="flex justify-center items-center py-4">
-                  <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-                  <span className="ml-2 text-green-700">Анализ документа...</span>
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <span className="ml-2 text-primary">Анализ документа...</span>
                 </div>
               )}
 
@@ -472,20 +554,20 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
           </Card>
 
           {showSummary && (
-            <Card className="border-green-200 shadow-md mt-6">
-              <CardHeader className="bg-green-50 rounded-t-lg">
+            <Card className="border-primary shadow-md mt-6">
+              <CardHeader className="bg-primary/10 py-2 rounded-t-lg">
                 <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-green-600" />
-                  <CardTitle className="text-green-800">Краткое резюме</CardTitle>
+                  <Info className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-foreground">Краткое резюме</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <p className="text-green-700 text-sm">
+                <p className="text-foreground text-sm">
                   Техническое задание описывает систему управления данными клиентов с функциями
                   аутентификации и шифрования. Основные аспекты, требующие соответствия нормативным
                   актам:
                 </p>
-                <ul className="mt-2 space-y-1 text-sm text-green-700 list-disc pl-5">
+                <ul className="mt-2 space-y-1 text-sm text-foreground list-disc pl-5">
                   <li>Обработка персональных данных клиентов</li>
                   <li>Хранение конфиденциальной информации</li>
                   <li>Требования к системам аутентификации</li>
@@ -499,21 +581,21 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
 
         <div className="lg:col-span-2">
           {filteredResults && (
-            <Card className="border-green-200 shadow-md">
-              <CardHeader className="bg-green-50 rounded-t-lg">
+            <Card className="border-primary shadow-md">
+              <CardHeader className="bg-primary/10 py-2 rounded-t-lg">
                 <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-green-600" />
-                  <CardTitle className="text-green-800">Результаты анализа</CardTitle>
+                  <FileText className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-foreground">Результаты анализа</CardTitle>
                 </div>
-                <CardDescription className="text-green-700">
+                <CardDescription className="text-muted-foreground">
                   Нормативные документы, относящиеся к вашему техническому заданию
                 </CardDescription>
 
                 {selectedRegulations.length > 0 && (
                   <div className="mt-3">
-                    <Separator className="mb-2 bg-green-100" />
+                    <Separator className="mb-2 bg-primary/10" />
                     <div className="flex flex-wrap gap-2 items-center">
-                      <span className="text-xs text-green-700">Активные фильтры:</span>
+                      <span className="text-xs text-primary">Активные фильтры:</span>
                       {selectedRegulations.map(regId => {
                         const regulation = availableRegulations.find(r => r.id === regId);
                         if (!regulation) return null;
@@ -522,13 +604,13 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                           <Badge
                             key={regId}
                             variant="outline"
-                            className="bg-green-50 border-green-200 text-green-800 flex items-center gap-1 pl-2 pr-1"
+                            className="bg-primary/10 border-primary text-primary flex items-center gap-1 pl-2 pr-1"
                           >
                             {regulation.title}
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-5 w-5 p-0 hover:bg-green-100 rounded-full"
+                              className="h-5 w-5 p-0 hover:bg-primary/20 rounded-full"
                               onClick={() => handleFilterChange(regId)}
                             >
                               <X className="h-3 w-3" />
@@ -541,7 +623,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-7 px-2 text-xs text-green-700 hover:bg-green-100"
+                        className="h-7 px-2 text-xs text-primary hover:bg-primary/20"
                         onClick={resetFilters}
                       >
                         Сбросить все
@@ -552,16 +634,16 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
               </CardHeader>
               <CardContent className="pt-6">
                 <Tabs defaultValue="relevant" className="w-full">
-                  <TabsList className="mb-4 bg-green-100">
+                  <TabsList className="mb-4 bg-primary/10">
                     <TabsTrigger
                       value="relevant"
-                      className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
+                      className="data-[state=active]:bg-primary data-[state=active]:text-white"
                     >
                       Релевантные НПА
                     </TabsTrigger>
                     <TabsTrigger
                       value="sections"
-                      className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
+                      className="data-[state=active]:bg-primary data-[state=active]:text-white"
                     >
                       По разделам
                     </TabsTrigger>
@@ -572,12 +654,12 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                       filteredResults.map(regulation => (
                         <div
                           key={regulation.id}
-                          className="border border-green-200 rounded-lg p-4 space-y-3 hover:bg-green-50"
+                          className="border border-primary rounded-lg p-4 space-y-3 hover:bg-primary/10"
                         >
                           <div className="flex justify-between items-start">
                             <div>
-                              <h3 className="font-medium text-green-800">{regulation.title}</h3>
-                              <p className="text-sm text-green-700">{regulation.description}</p>
+                              <h3 className="font-medium text-primary">{regulation.title}</h3>
+                              <p className="text-sm text-primary">{regulation.description}</p>
                             </div>
                             <Badge
                               variant={
@@ -589,10 +671,10 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                               }
                               className={
                                 regulation.relevance > 90
-                                  ? "bg-red-500"
+                                  ? "bg-destructive"
                                   : regulation.relevance > 80
-                                    ? "bg-green-600"
-                                    : "border-green-500 text-green-700 bg-green-50"
+                                    ? "bg-primary"
+                                    : "border-primary text-primary bg-primary/10"
                               }
                             >
                               {regulation.relevance}% Совпадение
@@ -604,7 +686,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                               <Badge
                                 key={section}
                                 variant="secondary"
-                                className="bg-green-100 text-green-800"
+                                className="bg-primary text-secondary"
                               >
                                 {section}
                               </Badge>
@@ -612,18 +694,23 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                           </div>
 
                           <div className="flex justify-end gap-2">
-                            <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                              <Download className="mr-2 h-4 w-4" />
-                              Скачать документ
-                            </Button>
+                            <Link
+                              to={regulation.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-primary hover:text-primary hover:underline flex items-center"
+                            >
+                              <FileText className="mr-1.5 h-4 w-4" />
+                              Перейти к документу
+                            </Link>
                           </div>
                         </div>
                       ))
                     ) : (
                       <div className="text-center py-8">
-                        <Info className="mx-auto h-12 w-12 text-green-400 opacity-50" />
-                        <h3 className="mt-4 text-lg font-medium text-green-800">Нет результатов</h3>
-                        <p className="mt-2 text-sm text-green-600">
+                        <Info className="mx-auto h-12 w-12 text-primary opacity-50" />
+                        <h3 className="mt-4 text-lg font-medium text-primary">Нет результатов</h3>
+                        <p className="mt-2 text-sm text-primary">
                           По выбранным фильтрам не найдено нормативных актов. Попробуйте изменить
                           параметры фильтрации.
                         </p>
@@ -637,7 +724,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                         Array.from(new Set(filteredResults.flatMap(r => r.sections))).map(
                           section => (
                             <div key={section} className="space-y-3">
-                              <h3 className="font-medium text-lg text-green-800 border-b border-green-200 pb-2">
+                              <h3 className="font-medium text-lg text-primary border-b border-primary/10 pb-2">
                                 {section}
                               </h3>
                               <div className="space-y-3">
@@ -646,15 +733,24 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                                   .map(regulation => (
                                     <div
                                       key={regulation.id}
-                                      className="border border-green-200 rounded-lg p-3 flex justify-between items-center hover:bg-green-50"
+                                      className="border border-primary rounded-lg p-3 flex justify-between items-center hover:bg-primary/10"
                                     >
                                       <div>
-                                        <h4 className="font-medium text-green-800">
+                                        <h4 className="font-medium text-primary">
                                           {regulation.title}
                                         </h4>
-                                        <p className="text-sm text-green-700">
+                                        <p className="text-sm text-primary">
                                           {regulation.description}
                                         </p>
+                                        <Link
+                                          to={regulation.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-xs text-primary hover:text-primary hover:underline flex items-center mt-1"
+                                        >
+                                          <FileText className="mr-1 h-3 w-3" />
+                                          Перейти к документу
+                                        </Link>
                                       </div>
                                       <Badge
                                         variant={
@@ -666,10 +762,10 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                                         }
                                         className={
                                           regulation.relevance > 90
-                                            ? "bg-red-500"
+                                            ? "bg-destructive"
                                             : regulation.relevance > 80
-                                              ? "bg-green-600"
-                                              : "border-green-500 text-green-700 bg-green-50"
+                                              ? "bg-primary"
+                                              : "border-primary text-primary bg-primary/10"
                                         }
                                       >
                                         {regulation.relevance}% Совпадение
@@ -682,11 +778,9 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                         )
                       ) : (
                         <div className="text-center py-8">
-                          <Info className="mx-auto h-12 w-12 text-green-400 opacity-50" />
-                          <h3 className="mt-4 text-lg font-medium text-green-800">
-                            Нет результатов
-                          </h3>
-                          <p className="mt-2 text-sm text-green-600">
+                          <Info className="mx-auto h-12 w-12 text-primary opacity-50" />
+                          <h3 className="mt-4 text-lg font-medium text-primary">Нет результатов</h3>
+                          <p className="mt-2 text-sm text-primary">
                             По выбранным фильтрам не найдено нормативных актов. Попробуйте изменить
                             параметры фильтрации.
                           </p>
@@ -698,7 +792,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
 
                 <div className="mt-6 flex justify-end">
                   <Button
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-primary hover:bg-primary"
                     onClick={handleDownloadReport}
                     disabled={downloadReportMutation.isPending}
                   >
@@ -715,13 +809,13 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
           )}
 
           {showSuggestions && (
-            <Card className="border-green-200 shadow-md mt-6">
-              <CardHeader className="bg-green-50 rounded-t-lg">
+            <Card className="border-primary shadow-md mt-6">
+              <CardHeader className="bg-primary/10 py-2 rounded-t-lg">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <CardTitle className="text-green-800">Предложения по улучшению</CardTitle>
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-foreground">Предложения по улучшению</CardTitle>
                 </div>
-                <CardDescription className="text-green-700">
+                <CardDescription className="text-muted-foreground">
                   Рекомендации по доработке технического задания для соответствия нормативным
                   требованиям
                 </CardDescription>
@@ -730,48 +824,74 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                 {mockSuggestions.map(suggestion => (
                   <div
                     key={suggestion.id}
-                    className="border border-green-200 rounded-lg p-4 space-y-2 hover:bg-green-50"
+                    className="border border-primary rounded-lg p-4 space-y-2 hover:bg-primary/10"
                   >
                     <div className="flex items-start gap-2">
                       {suggestion.status === "critical" && (
-                        <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 shrink-0" />
+                        <AlertTriangle
+                          style={{ color: "#FF0000" }}
+                          className="h-5 w-5 mt-0.5 shrink-0"
+                        />
                       )}
                       {suggestion.status === "warning" && (
-                        <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
+                        <AlertTriangle
+                          style={{ color: "#FFA500" }}
+                          className="h-5 w-5 mt-0.5 shrink-0"
+                        />
                       )}
                       {suggestion.status === "info" && (
-                        <Clock className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+                        <Clock style={{ color: "#0000FF" }} className="h-5 w-5 mt-0.5 shrink-0" />
                       )}
                       {suggestion.status === "success" && (
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
+                        <CheckCircle
+                          style={{ color: "#008000" }}
+                          className="h-5 w-5 mt-0.5 shrink-0"
+                        />
                       )}
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-medium text-green-800">{suggestion.regulation}</h3>
+                          <h3 className="font-medium text-foreground">{suggestion.regulation}</h3>
                           {suggestion.articles && (
-                            <span className="text-sm text-green-700">({suggestion.articles})</span>
+                            <span className="text-sm text-foreground">({suggestion.articles})</span>
                           )}
                         </div>
-                        <p className="text-sm text-green-700">→ {suggestion.requirement}</p>
+                        <p className="text-sm text-foreground">→ {suggestion.requirement}</p>
                         <div className="mt-2 flex items-center gap-2">
                           <Badge
-                            className={
+                            style={
                               suggestion.status === "critical"
-                                ? "bg-red-100 text-red-800 border-red-300"
+                                ? {
+                                    backgroundColor: "#FFEBEE",
+                                    color: "#B71C1C",
+                                    borderColor: "#FFCDD2",
+                                  }
                                 : suggestion.status === "warning"
-                                  ? "bg-amber-100 text-amber-800 border-amber-300"
+                                  ? {
+                                      backgroundColor: "#FFF8E1",
+                                      color: "#F57F17",
+                                      borderColor: "#FFECB3",
+                                    }
                                   : suggestion.status === "info"
-                                    ? "bg-blue-100 text-blue-800 border-blue-300"
-                                    : "bg-green-100 text-green-800 border-green-300"
+                                    ? {
+                                        backgroundColor: "#E3F2FD",
+                                        color: "#0D47A1",
+                                        borderColor: "#BBDEFB",
+                                      }
+                                    : {
+                                        backgroundColor: "#E8F5E9",
+                                        color: "#1B5E20",
+                                        borderColor: "#C8E6C9",
+                                      }
                             }
+                            className="text-xs py-1 font-medium border px-2 rounded"
                           >
                             {suggestion.status === "critical" && "Критично"}
                             {suggestion.status === "warning" && "Требует внимания"}
                             {suggestion.status === "info" && "Информация"}
                             {suggestion.status === "success" && "Соответствует"}
                           </Badge>
-                          <span className="text-sm font-medium text-green-800">Рекомендация:</span>
-                          <span className="text-sm text-green-700">{suggestion.action}</span>
+                          <span className="text-sm font-medium text-foreground">Рекомендация:</span>
+                          <span className="text-sm text-foreground">{suggestion.action}</span>
                         </div>
                       </div>
                     </div>
@@ -784,7 +904,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
           {!filteredResults && !isAnalyzing && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center p-8">
-                <p className="text-green-700">
+                <p className="text-primary">
                   Загрузите документ и начните анализ, чтобы увидеть результаты
                 </p>
               </div>
@@ -794,8 +914,8 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
           {isAnalyzing && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center p-8 flex flex-col items-center">
-                <Loader2 className="h-12 w-12 animate-spin text-green-600 mb-4" />
-                <p className="text-green-700">Анализ вашего документа...</p>
+                <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+                <p className="text-primary">Анализ вашего документа...</p>
               </div>
             </div>
           )}
