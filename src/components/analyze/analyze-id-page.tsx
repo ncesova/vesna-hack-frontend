@@ -553,7 +553,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
             </CardContent>
           </Card>
 
-          {showSummary && (
+          {/* {showSummary && (
             <Card className="border-primary shadow-md mt-6">
               <CardHeader className="bg-primary/10 py-2 rounded-t-lg">
                 <div className="flex items-center gap-2">
@@ -576,7 +576,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                 </ul>
               </CardContent>
             </Card>
-          )}
+          )} */}
         </div>
 
         <div className="lg:col-span-2">

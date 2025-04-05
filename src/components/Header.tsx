@@ -1,14 +1,31 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { useUpdateUserAuth } from "@/api/UserAuth/UserAuthApi";
 import { Button } from "@/components/ui/button";
-import { BookOpen, FileText, Home, Menu, User, X } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { BookOpen, FileText, Home, LogOut, Menu, User, X } from "lucide-react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const userName = "John Doe";
+  const email = "john.doe@example.com";
+
+  const { logoutUserMutation } = useUpdateUserAuth();
+
+  const handleLogout = () => {
+    logoutUserMutation.mutate();
+  };
 
   return (
-    <header className="border-b bg-secondary">
+    <header className="border-border bg-secondary">
       <div className="container mx-auto px-4 py-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link to="/" className="font-bold text-xl text-primary">
@@ -20,7 +37,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center justify-center text-primary hover:bg-secondary/80"
+                className="flex items-center justify-center text-primary hover:bg-secondary-foreground/10"
               >
                 <Home className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Главная</span>
@@ -30,7 +47,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center justify-center text-primary hover:bg-secondary/80"
+                className="flex items-center justify-center text-primary hover:bg-secondary-foreground/10"
               >
                 <FileText className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Мои документы</span>
@@ -40,27 +57,46 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center justify-center text-primary hover:bg-secondary/80"
+                className="flex items-center justify-center text-primary hover:bg-secondary-foreground/10"
               >
                 <BookOpen className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">База знаний</span>
               </Button>
             </Link>
-            <Button
-              variant="outline"
-              size="icon"
-              className="border-primary text-primary hover:bg-secondary/80"
-            >
-              <User className="h-4 w-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="border-primary text-primary hover:bg-secondary-foreground/10"
+                >
+                  <User className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-background border-border">
+                <DropdownMenuLabel className="font-medium py-2 text-primary">
+                  {userName}
+                </DropdownMenuLabel>
+                <div className="px-2 pb-2 text-xs text-muted-foreground truncate">{email}</div>
+                <DropdownMenuSeparator className="bg-border" />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={handleLogout}
+                  disabled={logoutUserMutation.isPending}
+                  className="mt-1 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  {logoutUserMutation.isPending ? "Выход..." : "Выйти"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
-          {/* Мобильное меню */}
           <div className="[@media(max-width:430px)]:block hidden">
             <Button
               variant="outline"
               size="icon"
-              className="border-primary text-primary hover:bg-secondary/80 transition-transform duration-300 hover:scale-110"
+              className="border-primary text-primary hover:bg-secondary-foreground/10 transition-transform duration-300 hover:scale-110"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <div className="relative w-4 h-4">
@@ -74,9 +110,8 @@ export default function Header() {
             </Button>
           </div>
 
-          {/* Мобильное меню (выпадающий список) */}
           <div
-            className={`absolute top-16 right-4 w-48 bg-white rounded-lg shadow-lg border border-primary z-50 [@media(max-width:430px)]:block hidden transition-all duration-300 transform ${
+            className={`absolute top-16 right-4 w-48 bg-background text-foreground rounded-lg shadow-lg border border-border z-50 [@media(max-width:430px)]:block hidden transition-all duration-300 transform ${
               isMenuOpen
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 -translate-y-2 pointer-events-none"
@@ -87,7 +122,7 @@ export default function Header() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start text-primary hover:bg-secondary/80 transition-colors duration-200"
+                  className="w-full justify-start text-primary hover:bg-secondary-foreground/10 transition-colors duration-200"
                 >
                   <Home className="h-4 w-4 mr-2" />
                   Главная
@@ -97,7 +132,7 @@ export default function Header() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start text-primary hover:bg-secondary/80 transition-colors duration-200"
+                  className="w-full justify-start text-primary hover:bg-secondary-foreground/10 transition-colors duration-200"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Мои документы
@@ -107,20 +142,36 @@ export default function Header() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start text-primary hover:bg-secondary/80 transition-colors duration-200"
+                  className="w-full justify-start text-primary hover:bg-secondary-foreground/10 transition-colors duration-200"
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
                   База знаний
                 </Button>
               </Link>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start text-primary hover:bg-secondary/80 transition-colors duration-200"
-              >
-                <User className="h-4 w-4 mr-2" />
-                Профиль
-              </Button>
+              <div className="flex flex-col">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-primary hover:bg-secondary-foreground/10 transition-colors duration-200 mt-1"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  {userName || "Профиль"}
+                </Button>
+                {email && (
+                  <div className="px-4 py-2 text-xs text-muted-foreground truncate">{email}</div>
+                )}
+                <div className="h-px my-1 bg-border"></div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-destructive hover:bg-destructive/10 transition-colors duration-200 py-2 mt-1"
+                  onClick={handleLogout}
+                  disabled={logoutUserMutation.isPending}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  {logoutUserMutation.isPending ? "Выход..." : "Выйти"}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
