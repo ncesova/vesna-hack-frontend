@@ -33,6 +33,7 @@ export default function SignUpForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -41,6 +42,14 @@ export default function SignUpForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+
+    fetch("api/auth/signup", {})
+      .then(res => {
+        if (res.ok) {
+        }
+      })
+      .catch()
+      .finally();
   }
 
   interface FormControl {
@@ -87,13 +96,13 @@ export default function SignUpForm() {
             name={control.name}
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700">{control.label}</FormLabel>
+                <FormLabel className="text-slate-700 font-medium">{control.label}</FormLabel>
                 <FormControl>
                   <Input
                     type={control.type}
                     placeholder={control.placeholder}
                     {...field}
-                    className="focus-visible:ring-blue-500"
+                    className="border-slate-200 focus-visible:ring-blue-500 bg-slate-50 placeholder:text-slate-400"
                   />
                 </FormControl>
                 <FormMessage className="text-red-500" />
@@ -104,7 +113,7 @@ export default function SignUpForm() {
 
         <Button
           type="submit"
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-6 text-lg transition-all duration-300"
         >
           Зарегистрироваться
         </Button>
