@@ -10,10 +10,6 @@ export interface UserResponseDTO {
 	id: number;
 	email: string;
 	name: string;
-	statistics: {
-		user_qr_scanned_count: number;
-		coupons_bought: number;
-	};
 }
 
 export default class UserAuthService {
