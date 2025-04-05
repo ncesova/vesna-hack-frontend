@@ -15,6 +15,10 @@ import { BookOpen, FileText, Home, LogOut, Menu, User, X } from "lucide-react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLinkClick = () => {
+    setIsMenuOpen(false);
+  };
   const userName = "John Doe";
   const email = "john.doe@example.com";
 
@@ -37,7 +41,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center justify-center text-primary hover:bg-secondary-foreground/10"
+                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80"
               >
                 <Home className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Главная</span>
@@ -47,7 +51,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center justify-center text-primary hover:bg-secondary-foreground/10"
+                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80"
               >
                 <FileText className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Мои документы</span>
@@ -57,7 +61,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center justify-center text-primary hover:bg-secondary-foreground/10"
+                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80"
               >
                 <BookOpen className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">База знаний</span>
@@ -96,7 +100,7 @@ export default function Header() {
             <Button
               variant="outline"
               size="icon"
-              className="border-primary text-primary hover:bg-secondary-foreground/10 transition-transform duration-300 hover:scale-110"
+              className="cursor-pointer border-primary text-primary hover:bg-secondary/80 transition-transform duration-300 hover:scale-110"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <div className="relative w-4 h-4">
@@ -118,7 +122,7 @@ export default function Header() {
             }`}
           >
             <div className="flex flex-col p-2 gap-1">
-              <Link to="/" className="w-full">
+              <Link to="/" onClick={handleLinkClick}>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -128,7 +132,7 @@ export default function Header() {
                   Главная
                 </Button>
               </Link>
-              <Link to="/my-documents" className="w-full">
+              <Link to="/my-documents" onClick={handleLinkClick}>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -138,7 +142,7 @@ export default function Header() {
                   Мои документы
                 </Button>
               </Link>
-              <Link to="/knowledge-base" className="w-full">
+              <Link to="/knowledge-base" onClick={handleLinkClick}>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -148,6 +152,7 @@ export default function Header() {
                   База знаний
                 </Button>
               </Link>
+
               <div className="flex flex-col">
                 <Button
                   variant="ghost"
