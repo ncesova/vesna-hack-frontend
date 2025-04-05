@@ -20,6 +20,12 @@ export interface AnalyzeResultResponseDTO {
   highlights: Highlight[];
 }
 
+// New DTO for full report download
+export interface DownloadReportRequestDTO {
+  id: string;
+  format?: "docx" | "pdf";
+}
+
 interface NormativeDocument {
   id: string;
   title: string;
@@ -56,6 +62,18 @@ export default class AnalyzeService {
     id,
   }: AnalyzeResultRequestDTO): Promise<AnalyzeResultResponseDTO> {
     const response = await $api.get<AnalyzeResultResponseDTO>(`/analyze/${id}`);
+    return response.data;
+  }
+
+  // New method for downloading full report
+  static async downloadFullReport({
+    id,
+    format = "docx",
+  }: DownloadReportRequestDTO): Promise<Blob> {
+    const response = await $api.get(`/analyze/${id}/report`, {
+      params: { format },
+      responseType: "blob",
+    });
     return response.data;
   }
 }
