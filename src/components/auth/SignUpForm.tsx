@@ -10,9 +10,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { formControls } from "@/shared/testData";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import type { IFormControl } from "./formTypes";
 
 const formSchema = z
   .object({
@@ -52,44 +54,10 @@ export default function SignUpForm() {
       .finally();
   }
 
-  interface FormControl {
-    label: string;
-    name: "name" | "password" | "email" | "confirmPassword";
-    placeholder: string;
-    type?: string;
-  }
-
-  const formControls: FormControl[] = [
-    {
-      label: "Имя",
-      name: "name",
-      placeholder: "Введите имя",
-      type: "text",
-    },
-    {
-      label: "Email",
-      name: "email",
-      placeholder: "Введите email",
-      type: "email",
-    },
-    {
-      label: "Пароль",
-      name: "password",
-      placeholder: "Введите пароль",
-      type: "password",
-    },
-    {
-      label: "Подтвердите пароль",
-      name: "confirmPassword",
-      placeholder: "Повторите пароль",
-      type: "password",
-    },
-  ];
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {formControls.map((control: FormControl, i: number) => (
+        {formControls.map((control: IFormControl, i: number) => (
           <FormField
             key={i}
             control={form.control}
