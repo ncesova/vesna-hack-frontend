@@ -1,3 +1,4 @@
+import MyDocuments from "@/components/myDocuments/MyDocuments";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/my-documents")({
@@ -5,5 +6,5 @@ export const Route = createFileRoute("/my-documents")({
 });
 
 function RouteComponent() {
-  return <div>Hello "/my-documents"!</div>;
+  return <MyDocuments />;
 }

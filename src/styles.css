@@ -51,6 +51,15 @@ code {
   --sidebar-accent-foreground: oklch(0.55 0.15 142);
   --sidebar-border: oklch(0.9 0.01 214.3);
   --sidebar-ring: oklch(0.64 0.17 142);
+  --slate-light: oklch(0.9 0.01 214.3);
+  --slate-dark: oklch(0.141 0.005 285.823);
+  --slate: oklch(0.5 0.01 214.3);
+  --blue: #3b82f6;
+  --blue-light: #60a5fa;
+  --blue-dark: #1d4ed8;
+  --indigo: #6366f1;
+  --indigo-light: #818cf8;
+  --indigo-dark: #4338ca;
 }
 
 .dark {
