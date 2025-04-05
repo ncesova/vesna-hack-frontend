@@ -11,15 +11,36 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as MyDocumentsImport } from './routes/my-documents'
+import { Route as KnowledgeBaseImport } from './routes/knowledge-base'
 import { Route as AuthImport } from './routes/auth'
+import { Route as ActsImport } from './routes/acts'
 import { Route as IndexImport } from './routes/index'
-import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
+import { Route as AnalyzeIdImport } from './routes/analyze.$id'
 
 // Create/Update Routes
+
+const MyDocumentsRoute = MyDocumentsImport.update({
+  id: '/my-documents',
+  path: '/my-documents',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const KnowledgeBaseRoute = KnowledgeBaseImport.update({
+  id: '/knowledge-base',
+  path: '/knowledge-base',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AuthRoute = AuthImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ActsRoute = ActsImport.update({
+  id: '/acts',
+  path: '/acts',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -29,9 +50,9 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DemoTanstackQueryRoute = DemoTanstackQueryImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
+const AnalyzeIdRoute = AnalyzeIdImport.update({
+  id: '/analyze/$id',
+  path: '/analyze/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -46,6 +67,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/acts': {
+      id: '/acts'
+      path: '/acts'
+      fullPath: '/acts'
+      preLoaderRoute: typeof ActsImport
+      parentRoute: typeof rootRoute
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -53,11 +81,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryImport
+    '/knowledge-base': {
+      id: '/knowledge-base'
+      path: '/knowledge-base'
+      fullPath: '/knowledge-base'
+      preLoaderRoute: typeof KnowledgeBaseImport
+      parentRoute: typeof rootRoute
+    }
+    '/my-documents': {
+      id: '/my-documents'
+      path: '/my-documents'
+      fullPath: '/my-documents'
+      preLoaderRoute: typeof MyDocumentsImport
+      parentRoute: typeof rootRoute
+    }
+    '/analyze/$id': {
+      id: '/analyze/$id'
+      path: '/analyze/$id'
+      fullPath: '/analyze/$id'
+      preLoaderRoute: typeof AnalyzeIdImport
       parentRoute: typeof rootRoute
     }
   }
@@ -67,42 +109,76 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/acts': typeof ActsRoute
   '/auth': typeof AuthRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/knowledge-base': typeof KnowledgeBaseRoute
+  '/my-documents': typeof MyDocumentsRoute
+  '/analyze/$id': typeof AnalyzeIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/acts': typeof ActsRoute
   '/auth': typeof AuthRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/knowledge-base': typeof KnowledgeBaseRoute
+  '/my-documents': typeof MyDocumentsRoute
+  '/analyze/$id': typeof AnalyzeIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/acts': typeof ActsRoute
   '/auth': typeof AuthRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/knowledge-base': typeof KnowledgeBaseRoute
+  '/my-documents': typeof MyDocumentsRoute
+  '/analyze/$id': typeof AnalyzeIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/demo/tanstack-query'
+  fullPaths:
+    | '/'
+    | '/acts'
+    | '/auth'
+    | '/knowledge-base'
+    | '/my-documents'
+    | '/analyze/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/demo/tanstack-query'
-  id: '__root__' | '/' | '/auth' | '/demo/tanstack-query'
+  to:
+    | '/'
+    | '/acts'
+    | '/auth'
+    | '/knowledge-base'
+    | '/my-documents'
+    | '/analyze/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/acts'
+    | '/auth'
+    | '/knowledge-base'
+    | '/my-documents'
+    | '/analyze/$id'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ActsRoute: typeof ActsRoute
   AuthRoute: typeof AuthRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  KnowledgeBaseRoute: typeof KnowledgeBaseRoute
+  MyDocumentsRoute: typeof MyDocumentsRoute
+  AnalyzeIdRoute: typeof AnalyzeIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ActsRoute: ActsRoute,
   AuthRoute: AuthRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  KnowledgeBaseRoute: KnowledgeBaseRoute,
+  MyDocumentsRoute: MyDocumentsRoute,
+  AnalyzeIdRoute: AnalyzeIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -116,18 +192,30 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/acts",
         "/auth",
-        "/demo/tanstack-query"
+        "/knowledge-base",
+        "/my-documents",
+        "/analyze/$id"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
+    "/acts": {
+      "filePath": "acts.tsx"
+    },
     "/auth": {
       "filePath": "auth.tsx"
     },
-    "/demo/tanstack-query": {
-      "filePath": "demo.tanstack-query.tsx"
+    "/knowledge-base": {
+      "filePath": "knowledge-base.tsx"
+    },
+    "/my-documents": {
+      "filePath": "my-documents.tsx"
+    },
+    "/analyze/$id": {
+      "filePath": "analyze.$id.tsx"
     }
   }
 }
