@@ -1,3 +1,4 @@
+import AnalyzePage from "@/components/analyze/analyze-id-page";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/analyze/$id")({
@@ -6,5 +7,5 @@ export const Route = createFileRoute("/analyze/$id")({
 
 function RouteComponent() {
   const { id } = Route.useParams();
-  return <div>Hello "/analyze/{id}"!</div>;
+  return <AnalyzePage id={id} />;
 }

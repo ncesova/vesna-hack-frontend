@@ -11,11 +11,15 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+<<<<<<< HEAD
 import { Route as MyDocumentsImport } from './routes/my-documents'
 import { Route as KnowledgeBaseImport } from './routes/knowledge-base'
+=======
+>>>>>>> main
 import { Route as AuthImport } from './routes/auth'
 import { Route as ActsImport } from './routes/acts'
 import { Route as IndexImport } from './routes/index'
+import { Route as AnalyzeIndexImport } from './routes/analyze.index'
 import { Route as AnalyzeIdImport } from './routes/analyze.$id'
 
 // Create/Update Routes
@@ -50,6 +54,12 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AnalyzeIndexRoute = AnalyzeIndexImport.update({
+  id: '/analyze/',
+  path: '/analyze/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AnalyzeIdRoute = AnalyzeIdImport.update({
   id: '/analyze/$id',
   path: '/analyze/$id',
@@ -79,6 +89,7 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthImport
+<<<<<<< HEAD
       parentRoute: typeof rootRoute
     }
     '/knowledge-base': {
@@ -93,6 +104,8 @@ declare module '@tanstack/react-router' {
       path: '/my-documents'
       fullPath: '/my-documents'
       preLoaderRoute: typeof MyDocumentsImport
+=======
+>>>>>>> main
       parentRoute: typeof rootRoute
     }
     '/analyze/$id': {
@@ -100,6 +113,13 @@ declare module '@tanstack/react-router' {
       path: '/analyze/$id'
       fullPath: '/analyze/$id'
       preLoaderRoute: typeof AnalyzeIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/analyze/': {
+      id: '/analyze/'
+      path: '/analyze'
+      fullPath: '/analyze'
+      preLoaderRoute: typeof AnalyzeIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -111,18 +131,28 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acts': typeof ActsRoute
   '/auth': typeof AuthRoute
+<<<<<<< HEAD
   '/knowledge-base': typeof KnowledgeBaseRoute
   '/my-documents': typeof MyDocumentsRoute
   '/analyze/$id': typeof AnalyzeIdRoute
+=======
+  '/analyze/$id': typeof AnalyzeIdRoute
+  '/analyze': typeof AnalyzeIndexRoute
+>>>>>>> main
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/acts': typeof ActsRoute
   '/auth': typeof AuthRoute
+<<<<<<< HEAD
   '/knowledge-base': typeof KnowledgeBaseRoute
   '/my-documents': typeof MyDocumentsRoute
   '/analyze/$id': typeof AnalyzeIdRoute
+=======
+  '/analyze/$id': typeof AnalyzeIdRoute
+  '/analyze': typeof AnalyzeIndexRoute
+>>>>>>> main
 }
 
 export interface FileRoutesById {
@@ -130,13 +160,19 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/acts': typeof ActsRoute
   '/auth': typeof AuthRoute
+<<<<<<< HEAD
   '/knowledge-base': typeof KnowledgeBaseRoute
   '/my-documents': typeof MyDocumentsRoute
   '/analyze/$id': typeof AnalyzeIdRoute
+=======
+  '/analyze/$id': typeof AnalyzeIdRoute
+  '/analyze/': typeof AnalyzeIndexRoute
+>>>>>>> main
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
+<<<<<<< HEAD
   fullPaths:
     | '/'
     | '/acts'
@@ -160,6 +196,12 @@ export interface FileRouteTypes {
     | '/knowledge-base'
     | '/my-documents'
     | '/analyze/$id'
+=======
+  fullPaths: '/' | '/acts' | '/auth' | '/analyze/$id' | '/analyze'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/acts' | '/auth' | '/analyze/$id' | '/analyze'
+  id: '__root__' | '/' | '/acts' | '/auth' | '/analyze/$id' | '/analyze/'
+>>>>>>> main
   fileRoutesById: FileRoutesById
 }
 
@@ -167,18 +209,28 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActsRoute: typeof ActsRoute
   AuthRoute: typeof AuthRoute
+<<<<<<< HEAD
   KnowledgeBaseRoute: typeof KnowledgeBaseRoute
   MyDocumentsRoute: typeof MyDocumentsRoute
   AnalyzeIdRoute: typeof AnalyzeIdRoute
+=======
+  AnalyzeIdRoute: typeof AnalyzeIdRoute
+  AnalyzeIndexRoute: typeof AnalyzeIndexRoute
+>>>>>>> main
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActsRoute: ActsRoute,
   AuthRoute: AuthRoute,
+<<<<<<< HEAD
   KnowledgeBaseRoute: KnowledgeBaseRoute,
   MyDocumentsRoute: MyDocumentsRoute,
   AnalyzeIdRoute: AnalyzeIdRoute,
+=======
+  AnalyzeIdRoute: AnalyzeIdRoute,
+  AnalyzeIndexRoute: AnalyzeIndexRoute,
+>>>>>>> main
 }
 
 export const routeTree = rootRoute
@@ -194,9 +246,14 @@ export const routeTree = rootRoute
         "/",
         "/acts",
         "/auth",
+<<<<<<< HEAD
         "/knowledge-base",
         "/my-documents",
         "/analyze/$id"
+=======
+        "/analyze/$id",
+        "/analyze/"
+>>>>>>> main
       ]
     },
     "/": {
@@ -207,15 +264,21 @@ export const routeTree = rootRoute
     },
     "/auth": {
       "filePath": "auth.tsx"
+<<<<<<< HEAD
     },
     "/knowledge-base": {
       "filePath": "knowledge-base.tsx"
     },
     "/my-documents": {
       "filePath": "my-documents.tsx"
+=======
+>>>>>>> main
     },
     "/analyze/$id": {
       "filePath": "analyze.$id.tsx"
+    },
+    "/analyze/": {
+      "filePath": "analyze.index.tsx"
     }
   }
 }
