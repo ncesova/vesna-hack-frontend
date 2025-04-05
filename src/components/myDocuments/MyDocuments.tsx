@@ -464,23 +464,25 @@ export default function MyDocuments() {
         Вернуться на главную
       </Link>
       {/* Заголовок */}
-      <div className="">
-        <h1 className="text-2xl font-bold text-foreground mb-2">Мои документы</h1>
-        <p className="text-muted-foreground">Просмотр и управление загруженными документами</p>
+      <div className="mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Мои документы</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          Просмотр и управление загруженными документами
+        </p>
       </div>
 
       {/* Секция с документами */}
       <div
         id="section-documents"
-        className="bg-white rounded-lg border border-primary shadow-md p-6"
+        className="bg-white rounded-lg border border-primary shadow-md p-4 sm:p-6"
       >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg text-center font-semibold text-foreground">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground text-center sm:text-left">
             Загруженные документы
           </h2>
           <Input
             placeholder="Поиск документов..."
-            className="max-w-xs border-primary"
+            className="w-full sm:max-w-xs border-primary"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
