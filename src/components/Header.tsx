@@ -1,54 +1,55 @@
+import { Link } from "@tanstack/react-router";
+
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { FileText, Home, Settings, User } from "lucide-react";
 
 export default function Header() {
-  const navigate = useNavigate();
-
-  const links = [
-    {
-      label: "Главная",
-      to: "/",
-    },
-    {
-      label: "Войти",
-      to: "/auth",
-    },
-  ];
-
   return (
-    <header className="border-b border-slate-200 bg-gradient-to-r from-blue-50 via-indigo-50 to-slate-50 backdrop-blur-sm fixed w-full top-0 z-50 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <Link
-              to="/"
-              className="bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent font-bold text-xl hover:opacity-80 transition-opacity"
-            >
-              ТехАнализ
-            </Link>
-          </div>
+    <header className="border-b bg-secondary">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <Link to="/" className="font-bold text-xl text-primary">
+          <span>Система проверки ТЗ</span>
+        </Link>
 
-          <nav className="flex items-center space-x-4">
-            {links.map(link => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="text-slate-600 hover:text-blue-700 transition-colors px-3 py-2 rounded-md text-sm font-medium hover:bg-white/50"
-                activeProps={{ className: "text-blue-700 bg-white/50" }}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <Link to="/">
-              <Button
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white ml-2 transition-all duration-300"
-                size="sm"
-              >
-                Начать анализ
-              </Button>
-            </Link>
-          </nav>
-        </div>
+        <nav className="flex items-center gap-4">
+          <Link to="/">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center text-primary hover:bg-secondary/80"
+            >
+              <Home className="mr-2 h-4 w-4" />
+              <span>Главная</span>
+            </Button>
+          </Link>
+          <Link to="/my-documents">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center text-primary hover:bg-secondary/80"
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              <span>Мои документы</span>
+            </Button>
+          </Link>
+          <Link to="/knowledge-base">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center text-primary hover:bg-secondary/80"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              <span>База знаний</span>
+            </Button>
+          </Link>
+          <Button
+            variant="outline"
+            size="icon"
+            className="border-primary text-primary hover:bg-secondary/80"
+          >
+            <User className="h-4 w-4" />
+          </Button>
+        </nav>
       </div>
     </header>
   );
