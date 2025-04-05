@@ -27,20 +27,20 @@ import {
   AlertTriangle,
   ArrowLeft,
   Check,
-  CheckCircle,
   ChevronsUpDown,
   Clock,
   Download,
   FileText,
   Filter,
   Info,
+  Lightbulb,
   Loader2,
   X,
 } from "lucide-react";
 import { useState } from "react";
 
-// Текст технического задания
-const mockTzText = "Пример технического задания для новой системы управления данными клиентов с аутентификацией пользователей, шифрованием данных и облачным хранилищем. Система будет обрабатывать персональные данные, включая имена, адреса и платежные реквизиты.";
+const mockTzText =
+  "Пример технического задания для новой системы управления данными клиентов с аутентификацией пользователей, шифрованием данных и облачным хранилищем. Система будет обрабатывать персональные данные, включая имена, адреса и платежные реквизиты.";
 
 // Демонстрационные данные
 const mockResults = [
@@ -812,7 +812,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
             <Card className="border-primary shadow-md mt-6">
               <CardHeader className="bg-primary/10 py-2 rounded-t-lg">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-primary" />
+                  <Lightbulb className="h-5 w-5 text-primary" />
                   <CardTitle className="text-foreground">Предложения по улучшению</CardTitle>
                 </div>
                 <CardDescription className="text-muted-foreground">
@@ -843,7 +843,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                         <Clock style={{ color: "#0000FF" }} className="h-5 w-5 mt-0.5 shrink-0" />
                       )}
                       {suggestion.status === "success" && (
-                        <CheckCircle
+                        <Lightbulb
                           style={{ color: "#008000" }}
                           className="h-5 w-5 mt-0.5 shrink-0"
                         />
