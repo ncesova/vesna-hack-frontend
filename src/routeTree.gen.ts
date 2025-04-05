@@ -11,14 +11,10 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-<<<<<<< HEAD
-import { Route as SignUpImport } from './routes/sign-up'
-import { Route as SignInImport } from './routes/sign-in'
-import { Route as ActsImport } from './routes/acts'
-=======
 import { Route as AuthImport } from './routes/auth'
->>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
+import { Route as ActsImport } from './routes/acts'
 import { Route as IndexImport } from './routes/index'
+import { Route as AnalyzeIndexImport } from './routes/analyze.index'
 import { Route as AnalyzeIdImport } from './routes/analyze.$id'
 
 // Create/Update Routes
@@ -41,6 +37,12 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AnalyzeIndexRoute = AnalyzeIndexImport.update({
+  id: '/analyze/',
+  path: '/analyze/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AnalyzeIdRoute = AnalyzeIdImport.update({
   id: '/analyze/$id',
   path: '/analyze/$id',
@@ -58,7 +60,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-<<<<<<< HEAD
     '/acts': {
       id: '/acts'
       path: '/acts'
@@ -66,25 +67,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ActsImport
       parentRoute: typeof rootRoute
     }
-    '/sign-in': {
-      id: '/sign-in'
-      path: '/sign-in'
-      fullPath: '/sign-in'
-      preLoaderRoute: typeof SignInImport
-      parentRoute: typeof rootRoute
-    }
-    '/sign-up': {
-      id: '/sign-up'
-      path: '/sign-up'
-      fullPath: '/sign-up'
-      preLoaderRoute: typeof SignUpImport
-=======
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthImport
->>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
       parentRoute: typeof rootRoute
     }
     '/analyze/$id': {
@@ -94,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalyzeIdImport
       parentRoute: typeof rootRoute
     }
+    '/analyze/': {
+      id: '/analyze/'
+      path: '/analyze'
+      fullPath: '/analyze'
+      preLoaderRoute: typeof AnalyzeIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -101,84 +95,52 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-<<<<<<< HEAD
   '/acts': typeof ActsRoute
-  '/sign-in': typeof SignInRoute
-  '/sign-up': typeof SignUpRoute
-  '/analyze/$id': typeof AnalyzeIdRoute
-=======
   '/auth': typeof AuthRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
->>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
+  '/analyze/$id': typeof AnalyzeIdRoute
+  '/analyze': typeof AnalyzeIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-<<<<<<< HEAD
   '/acts': typeof ActsRoute
-  '/sign-in': typeof SignInRoute
-  '/sign-up': typeof SignUpRoute
-  '/analyze/$id': typeof AnalyzeIdRoute
-=======
   '/auth': typeof AuthRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
->>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
+  '/analyze/$id': typeof AnalyzeIdRoute
+  '/analyze': typeof AnalyzeIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-<<<<<<< HEAD
   '/acts': typeof ActsRoute
-  '/sign-in': typeof SignInRoute
-  '/sign-up': typeof SignUpRoute
-  '/analyze/$id': typeof AnalyzeIdRoute
-=======
   '/auth': typeof AuthRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
->>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
+  '/analyze/$id': typeof AnalyzeIdRoute
+  '/analyze/': typeof AnalyzeIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-<<<<<<< HEAD
-  fullPaths: '/' | '/acts' | '/sign-in' | '/sign-up' | '/analyze/$id'
+  fullPaths: '/' | '/acts' | '/auth' | '/analyze/$id' | '/analyze'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/acts' | '/sign-in' | '/sign-up' | '/analyze/$id'
-  id: '__root__' | '/' | '/acts' | '/sign-in' | '/sign-up' | '/analyze/$id'
-=======
-  fullPaths: '/' | '/auth' | '/demo/tanstack-query'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/demo/tanstack-query'
-  id: '__root__' | '/' | '/auth' | '/demo/tanstack-query'
->>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
+  to: '/' | '/acts' | '/auth' | '/analyze/$id' | '/analyze'
+  id: '__root__' | '/' | '/acts' | '/auth' | '/analyze/$id' | '/analyze/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-<<<<<<< HEAD
   ActsRoute: typeof ActsRoute
-  SignInRoute: typeof SignInRoute
-  SignUpRoute: typeof SignUpRoute
-  AnalyzeIdRoute: typeof AnalyzeIdRoute
-=======
   AuthRoute: typeof AuthRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
->>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
+  AnalyzeIdRoute: typeof AnalyzeIdRoute
+  AnalyzeIndexRoute: typeof AnalyzeIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-<<<<<<< HEAD
   ActsRoute: ActsRoute,
-  SignInRoute: SignInRoute,
-  SignUpRoute: SignUpRoute,
-  AnalyzeIdRoute: AnalyzeIdRoute,
-=======
   AuthRoute: AuthRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
->>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
+  AnalyzeIdRoute: AnalyzeIdRoute,
+  AnalyzeIndexRoute: AnalyzeIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -192,36 +154,26 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-<<<<<<< HEAD
         "/acts",
-        "/sign-in",
-        "/sign-up",
-        "/analyze/$id"
-=======
         "/auth",
-        "/demo/tanstack-query"
->>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
+        "/analyze/$id",
+        "/analyze/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-<<<<<<< HEAD
     "/acts": {
       "filePath": "acts.tsx"
     },
-    "/sign-in": {
-      "filePath": "sign-in.tsx"
-    },
-    "/sign-up": {
-      "filePath": "sign-up.tsx"
-=======
     "/auth": {
       "filePath": "auth.tsx"
->>>>>>> e7f173c7b31615f1af24b5819acadd1f75bbf6c5
     },
     "/analyze/$id": {
       "filePath": "analyze.$id.tsx"
+    },
+    "/analyze/": {
+      "filePath": "analyze.index.tsx"
     }
   }
 }

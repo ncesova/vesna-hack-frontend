@@ -1,7 +1,7 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import AnalyzeService, { type AnalyzeRequestDTO } from "./AnalyzeService";
 
-export const analyzeResultOptions = (id: number) => {
+export const analyzeResultOptions = (id: string) => {
   return queryOptions({
     queryKey: ["analyzeResult", id],
     queryFn: () => AnalyzeService.getAnalyzeResult({ id }),

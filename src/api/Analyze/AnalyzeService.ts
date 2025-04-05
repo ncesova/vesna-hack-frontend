@@ -1,16 +1,16 @@
 import { $api } from "@/api/api-clients";
 
 export interface AnalyzeRequestDTO {
-  userId: number;
+  userId: string;
   files: FormData;
 }
 
 export interface AnalyzeResponseDTO {
-  id: number;
+  id: string;
 }
 
 export interface AnalyzeResultRequestDTO {
-  id: number;
+  id: string;
 }
 
 export interface AnalyzeResultResponseDTO {
