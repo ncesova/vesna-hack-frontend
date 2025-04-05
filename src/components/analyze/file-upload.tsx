@@ -56,7 +56,7 @@ export function FileUpload() {
 
       // Add any other required fields - assuming there's a logged-in user
       // You may need to adjust this based on your application's auth state
-      const userId = 1; // Replace with actual user ID from your auth context
+      const userId = "1"; // Replace with actual user ID from your auth context
 
       // Call the API to analyze the content
       await analyzeMutation.mutateAsync({
@@ -80,29 +80,29 @@ export function FileUpload() {
 
   return (
     <Tabs defaultValue="upload" className="w-full">
-      <TabsList className="grid grid-cols-2 mb-4 bg-green-100">
+      <TabsList className="grid grid-cols-2 mb-4 bg-secondary">
         <TabsTrigger
           value="upload"
-          className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
+          className="data-[state=active]:bg-primary data-[state=active]:text-white"
         >
           Загрузить документ
         </TabsTrigger>
         <TabsTrigger
           value="paste"
-          className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
+          className="data-[state=active]:bg-primary data-[state=active]:text-white"
         >
           Вставить текст
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="upload" className="space-y-4">
-        <div className="border-2 border-dashed border-green-300 rounded-lg p-6 flex flex-col items-center justify-center gap-4 bg-green-50">
-          <Upload className="h-10 w-10 text-green-600" />
+        <div className="border-2 border-dashed border-border rounded-lg p-6 flex flex-col items-center justify-center gap-4 bg-secondary">
+          <Upload className="h-10 w-10 text-primary" />
           <div className="text-center">
-            <p className="text-sm font-medium text-green-800">
+            <p className="text-sm font-medium text-primary">
               {fileName ? fileName : "Перетащите документ сюда"}
             </p>
-            <p className="text-xs text-green-600 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Поддерживаются форматы DOCX, PDF и TXT до 10МБ
             </p>
           </div>
@@ -116,13 +116,13 @@ export function FileUpload() {
           <Button
             variant="outline"
             onClick={() => document.getElementById("file-upload")?.click()}
-            className="border-green-600 text-green-700 hover:bg-green-100"
+            className="border-primary text-primary hover:bg-secondary"
           >
             Выбрать файл
           </Button>
         </div>
         {fileName && (
-          <div className="flex items-center gap-2 text-sm text-green-700">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <FileText className="h-4 w-4" />
             <span>{fileName}</span>
           </div>
@@ -131,13 +131,13 @@ export function FileUpload() {
 
       <TabsContent value="paste" className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="specification-text" className="text-green-700">
+          <Label htmlFor="specification-text" className="text-primary">
             Вставьте текст технического задания
           </Label>
           <Textarea
             id="specification-text"
             placeholder="Введите текст технического задания здесь..."
-            className="min-h-[200px] border-green-300 focus-visible:ring-green-500"
+            className="min-h-[200px] border-border focus-visible:ring-primary"
             value={textContent}
             onChange={e => setTextContent(e.target.value)}
           />
@@ -146,7 +146,7 @@ export function FileUpload() {
 
       <div className="mt-6">
         <Button
-          className="w-full bg-green-600 hover:bg-green-700 text-white"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
           onClick={handleSubmit}
           disabled={isUploading || (!file && !textContent)}
         >
