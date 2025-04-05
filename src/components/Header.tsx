@@ -8,11 +8,7 @@ export default function Header() {
     },
     {
       label: "Войти",
-      to: "/sign-in",
-    },
-    {
-      label: "Регистрация",
-      to: "/sign-up",
+      to: "/auth",
     },
   ];
 
