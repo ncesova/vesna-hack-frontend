@@ -1,24 +1,40 @@
+import { useDownloadReport } from "@/api/Analyze/AnalyzeApi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
   ArrowLeft,
+  Check,
   CheckCircle,
+  ChevronsUpDown,
   Clock,
   Download,
   FileText,
   Filter,
   Info,
-  MessageSquare,
-  Send,
+  Loader2,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -138,28 +154,6 @@ const mockHighlights = [
   },
 ];
 
-// Добавим данные для диалога
-const mockDialogue = [
-  {
-    id: "1",
-    sender: "system",
-    message:
-      "Здравствуйте! Я помогу вам уточнить детали вашего технического задания для обеспечения соответствия нормативным требованиям. Какие аспекты вы хотели бы обсудить?",
-  },
-  {
-    id: "2",
-    sender: "user",
-    message:
-      "Меня интересует, какие требования предъявляются к хранению персональных данных клиентов?",
-  },
-  {
-    id: "3",
-    sender: "system",
-    message:
-      'Согласно ФЗ-152 "О персональных данных", вам необходимо:\n\n1. Получить согласие пользователей на обработку их персональных данных\n2. Обеспечить защиту данных от несанкционированного доступа\n3. Хранить данные на территории РФ\n4. Предоставить пользователям возможность удаления их данных\n\nХотите, чтобы я добавил эти требования в ваше ТЗ?',
-  },
-];
-
 // Список всех доступных НПА для фильтрации
 const availableRegulations = [
   { id: "1", title: "Федеральный закон № 152-ФЗ", description: "О персональных данных" },
@@ -189,46 +183,47 @@ interface AnalyzePageProps {
 }
 
 export default function AnalyzePage({ id }: AnalyzePageProps) {
-  // const { data } = useQuery(analyzeResultOptions(id));
+  // Comment out unused variables for now - will be used when API integration is complete
+  // const { data, isLoading } = useQuery(analyzeResultOptions(id));
+  // const { analyzeMutation } = useAnalyze();
+  const { downloadReportMutation } = useDownloadReport();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [results, setResults] = useState<typeof mockResults | null>(null);
   const [showSummary, setShowSummary] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showHighlights, setShowHighlights] = useState(false);
-  const [showDialogue, setShowDialogue] = useState(false);
   const [filteredResults, setFilteredResults] = useState<typeof mockResults | null>(null);
   const [selectedRegulations, setSelectedRegulations] = useState<string[]>([]);
-  const [showFilterPanel, setShowFilterPanel] = useState(false);
-  const [newMessage, setNewMessage] = useState("");
-  const [dialogue, setDialogue] = useState(mockDialogue);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Отфильтрованные регуляции по поисковому запросу
+  const filteredRegulations = searchTerm
+    ? availableRegulations.filter(
+        reg =>
+          reg.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          reg.description.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : availableRegulations;
 
   // Имитация процесса анализа
   const startAnalysis = () => {
     setIsAnalyzing(true);
-    setProgress(0);
-    setResults(null);
-    setFilteredResults(null);
-    setShowSummary(false);
-    setShowSuggestions(false);
-    setShowHighlights(false);
-    setSelectedRegulations([]);
 
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsAnalyzing(false);
-          setResults(mockResults);
-          setFilteredResults(mockResults);
-          setShowSummary(true);
-          setShowSuggestions(true);
-          setShowHighlights(true);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 500);
+    // Здесь будет вызов API для анализа
+    // Например:
+    // analyzeMutation.mutate({
+    //   userId: "user123",
+    //   files: formData
+    // });
+
+    // Временная имитация
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setShowSummary(true);
+      setShowSuggestions(true);
+      setShowHighlights(true);
+      setFilteredResults(mockResults);
+    }, 3000);
   };
 
   // Обработка фильтрации НПА
@@ -245,44 +240,23 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
   // Применение фильтров
   const applyFilters = () => {
     if (selectedRegulations.length === 0) {
-      setFilteredResults(results);
+      setFilteredResults(mockResults);
     } else {
-      setFilteredResults(results?.filter(item => selectedRegulations.includes(item.id)) || null);
+      setFilteredResults(
+        mockResults?.filter(item => selectedRegulations.includes(item.id)) || null
+      );
     }
-    setShowFilterPanel(false);
   };
 
   // Сброс фильтров
   const resetFilters = () => {
     setSelectedRegulations([]);
-    setFilteredResults(results);
-    setShowFilterPanel(false);
+    setFilteredResults(mockResults);
   };
 
-  // Обработка отправки сообщения в диалоге
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
-
-    // Добавляем сообщение пользователя
-    const userMessage = {
-      id: (dialogue.length + 1).toString(),
-      sender: "user",
-      message: newMessage,
-    };
-
-    setDialogue(prev => [...prev, userMessage]);
-    setNewMessage("");
-
-    // Имитация ответа системы
-    setTimeout(() => {
-      const systemMessage = {
-        id: (dialogue.length + 2).toString(),
-        sender: "system",
-        message:
-          "Спасибо за ваш вопрос! Я добавил соответствующие требования в ваше техническое задание. Хотите обсудить другие аспекты?",
-      };
-      setDialogue(prev => [...prev, systemMessage]);
-    }, 1000);
+  // Функция для скачивания полного отчета
+  const handleDownloadReport = () => {
+    downloadReportMutation.mutate({ id });
   };
 
   // Функция для подсветки текста
@@ -306,6 +280,133 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
 
     return highlightedText;
   };
+
+  // Replace the filter button and filter panel with dropdown menu
+  const filterButton = (
+    <DropdownMenu open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-green-600 text-green-700 hover:bg-green-100 flex gap-2 items-center"
+        >
+          <Filter className="h-4 w-4" />
+          Фильтр НПА
+          {selectedRegulations.length > 0 && (
+            <Badge className="ml-1 bg-green-600 hover:bg-green-700">
+              {selectedRegulations.length}
+            </Badge>
+          )}
+          <ChevronsUpDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-[340px] p-0" align="start">
+        <Command className="border-0">
+          <CommandInput
+            placeholder="Поиск нормативных актов..."
+            value={searchTerm}
+            onValueChange={setSearchTerm}
+            className="border-0 focus:ring-0"
+          />
+          <CommandList>
+            <CommandEmpty>Нормативных актов не найдено.</CommandEmpty>
+            <CommandGroup>
+              <div className="p-2">
+                <div className="flex items-center justify-between mb-2">
+                  <CommandItem
+                    className="px-2 cursor-pointer"
+                    onSelect={() => {
+                      if (selectedRegulations.length === filteredRegulations.length) {
+                        setSelectedRegulations([]);
+                      } else {
+                        setSelectedRegulations(filteredRegulations.map(r => r.id));
+                      }
+                    }}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="select-all"
+                          checked={
+                            filteredRegulations.length > 0 &&
+                            selectedRegulations.length === filteredRegulations.length
+                          }
+                          className="border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                        />
+                        <Label htmlFor="select-all" className="font-medium">
+                          Выбрать все
+                        </Label>
+                      </div>
+                      <span className="text-xs text-muted-foreground">Ctrl+A</span>
+                    </div>
+                  </CommandItem>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={resetFilters}
+                    className="h-8 px-2 text-sm text-green-700"
+                  >
+                    Сбросить
+                  </Button>
+                </div>
+              </div>
+
+              <CommandSeparator />
+
+              <ScrollArea className="h-[300px]">
+                {filteredRegulations.map(regulation => (
+                  <CommandItem
+                    key={regulation.id}
+                    onSelect={() => handleFilterChange(regulation.id)}
+                    className="px-2 py-1 cursor-pointer"
+                  >
+                    <div className="flex items-start space-x-2 w-full">
+                      <Checkbox
+                        id={`regulation-${regulation.id}`}
+                        checked={selectedRegulations.includes(regulation.id)}
+                        className="mt-1 border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                      />
+                      <div className="flex-1">
+                        <Label
+                          htmlFor={`regulation-${regulation.id}`}
+                          className="text-sm font-medium text-green-800"
+                        >
+                          {regulation.title}
+                        </Label>
+                        <p className="text-xs text-green-700">{regulation.description}</p>
+                      </div>
+                      {selectedRegulations.includes(regulation.id) && (
+                        <Check className="h-4 w-4 text-green-600" />
+                      )}
+                    </div>
+                  </CommandItem>
+                ))}
+              </ScrollArea>
+            </CommandGroup>
+          </CommandList>
+
+          <div className="flex items-center justify-between gap-2 p-2 border-t">
+            <div className="text-xs text-muted-foreground text-green-600">
+              <kbd className="px-1 bg-green-100 rounded">↑</kbd>{" "}
+              <kbd className="px-1 bg-green-100 rounded">↓</kbd> для навигации,
+              <kbd className="ml-1 px-1 bg-green-100 rounded">Enter</kbd> для выбора
+            </div>
+            <Button
+              size="sm"
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => {
+                applyFilters();
+                setIsFilterOpen(false);
+              }}
+            >
+              Применить
+            </Button>
+          </div>
+        </Command>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -353,43 +454,20 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                 </div>
               )}
 
-              {!isAnalyzing && !results && (
+              {!isAnalyzing && !showSummary && (
                 <Button onClick={startAnalysis} className="w-full bg-green-600 hover:bg-green-700">
                   Начать анализ
                 </Button>
               )}
 
               {isAnalyzing && (
-                <div className="space-y-2">
-                  <Progress value={progress} className="w-full bg-green-100" />
-                  <p className="text-xs text-center text-green-700">
-                    Анализ документа и сопоставление с нормативными требованиями...
-                  </p>
+                <div className="flex justify-center items-center py-4">
+                  <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+                  <span className="ml-2 text-green-700">Анализ документа...</span>
                 </div>
               )}
 
-              {results && (
-                <div className="flex justify-between">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-green-600 text-green-700 hover:bg-green-100"
-                    onClick={() => setShowDialogue(true)}
-                  >
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Режим диалога
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-green-600 text-green-700 hover:bg-green-100"
-                    onClick={() => setShowFilterPanel(!showFilterPanel)}
-                  >
-                    <Filter className="mr-2 h-4 w-4" />
-                    Фильтр НПА
-                  </Button>
-                </div>
-              )}
+              {showSummary && <div className="flex justify-between">{filterButton}</div>}
             </CardContent>
           </Card>
 
@@ -397,7 +475,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
             <Card className="border-green-200 shadow-md mt-6">
               <CardHeader className="bg-green-50 rounded-t-lg">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-green-600" />
+                  <Info className="h-5 w-5 text-green-600" />
                   <CardTitle className="text-green-800">Краткое резюме</CardTitle>
                 </div>
               </CardHeader>
@@ -417,415 +495,309 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
               </CardContent>
             </Card>
           )}
+        </div>
 
-          {showFilterPanel && (
-            <Card className="border-green-200 shadow-md mt-6">
+        <div className="lg:col-span-2">
+          {filteredResults && (
+            <Card className="border-green-200 shadow-md">
               <CardHeader className="bg-green-50 rounded-t-lg">
                 <div className="flex items-center gap-2">
-                  <Filter className="h-5 w-5 text-green-600" />
-                  <CardTitle className="text-green-800">Фильтр НПА</CardTitle>
+                  <FileText className="h-5 w-5 text-green-600" />
+                  <CardTitle className="text-green-800">Результаты анализа</CardTitle>
                 </div>
                 <CardDescription className="text-green-700">
-                  Выберите нормативные акты для проверки
+                  Нормативные документы, относящиеся к вашему техническому заданию
                 </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
-                  {availableRegulations.map(regulation => (
-                    <div key={regulation.id} className="flex items-start space-x-2">
-                      <Checkbox
-                        id={`regulation-${regulation.id}`}
-                        checked={selectedRegulations.includes(regulation.id)}
-                        onCheckedChange={() => handleFilterChange(regulation.id)}
-                        className="mt-1 border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
-                      />
-                      <div>
-                        <Label
-                          htmlFor={`regulation-${regulation.id}`}
-                          className="text-sm font-medium text-green-800"
-                        >
-                          {regulation.title}
-                        </Label>
-                        <p className="text-xs text-green-700">{regulation.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
 
-                <div className="flex justify-end gap-2 mt-4">
+                {selectedRegulations.length > 0 && (
+                  <div className="mt-3">
+                    <Separator className="mb-2 bg-green-100" />
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <span className="text-xs text-green-700">Активные фильтры:</span>
+                      {selectedRegulations.map(regId => {
+                        const regulation = availableRegulations.find(r => r.id === regId);
+                        if (!regulation) return null;
+
+                        return (
+                          <Badge
+                            key={regId}
+                            variant="outline"
+                            className="bg-green-50 border-green-200 text-green-800 flex items-center gap-1 pl-2 pr-1"
+                          >
+                            {regulation.title}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-5 w-5 p-0 hover:bg-green-100 rounded-full"
+                              onClick={() => handleFilterChange(regId)}
+                            >
+                              <X className="h-3 w-3" />
+                              <span className="sr-only">Remove</span>
+                            </Button>
+                          </Badge>
+                        );
+                      })}
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs text-green-700 hover:bg-green-100"
+                        onClick={resetFilters}
+                      >
+                        Сбросить все
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent className="pt-6">
+                <Tabs defaultValue="relevant" className="w-full">
+                  <TabsList className="mb-4 bg-green-100">
+                    <TabsTrigger
+                      value="relevant"
+                      className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
+                    >
+                      Релевантные НПА
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="sections"
+                      className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
+                    >
+                      По разделам
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="relevant" className="space-y-4">
+                    {filteredResults.length > 0 ? (
+                      filteredResults.map(regulation => (
+                        <div
+                          key={regulation.id}
+                          className="border border-green-200 rounded-lg p-4 space-y-3 hover:bg-green-50"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-medium text-green-800">{regulation.title}</h3>
+                              <p className="text-sm text-green-700">{regulation.description}</p>
+                            </div>
+                            <Badge
+                              variant={
+                                regulation.relevance > 90
+                                  ? "destructive"
+                                  : regulation.relevance > 80
+                                    ? "default"
+                                    : "outline"
+                              }
+                              className={
+                                regulation.relevance > 90
+                                  ? "bg-red-500"
+                                  : regulation.relevance > 80
+                                    ? "bg-green-600"
+                                    : "border-green-500 text-green-700 bg-green-50"
+                              }
+                            >
+                              {regulation.relevance}% Совпадение
+                            </Badge>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2">
+                            {regulation.sections.map(section => (
+                              <Badge
+                                key={section}
+                                variant="secondary"
+                                className="bg-green-100 text-green-800"
+                              >
+                                {section}
+                              </Badge>
+                            ))}
+                          </div>
+
+                          <div className="flex justify-end gap-2">
+                            <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                              <Download className="mr-2 h-4 w-4" />
+                              Скачать документ
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <Info className="mx-auto h-12 w-12 text-green-400 opacity-50" />
+                        <h3 className="mt-4 text-lg font-medium text-green-800">Нет результатов</h3>
+                        <p className="mt-2 text-sm text-green-600">
+                          По выбранным фильтрам не найдено нормативных актов. Попробуйте изменить
+                          параметры фильтрации.
+                        </p>
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="sections">
+                    <div className="space-y-6">
+                      {filteredResults.length > 0 ? (
+                        Array.from(new Set(filteredResults.flatMap(r => r.sections))).map(
+                          section => (
+                            <div key={section} className="space-y-3">
+                              <h3 className="font-medium text-lg text-green-800 border-b border-green-200 pb-2">
+                                {section}
+                              </h3>
+                              <div className="space-y-3">
+                                {filteredResults
+                                  .filter(r => r.sections.includes(section))
+                                  .map(regulation => (
+                                    <div
+                                      key={regulation.id}
+                                      className="border border-green-200 rounded-lg p-3 flex justify-between items-center hover:bg-green-50"
+                                    >
+                                      <div>
+                                        <h4 className="font-medium text-green-800">
+                                          {regulation.title}
+                                        </h4>
+                                        <p className="text-sm text-green-700">
+                                          {regulation.description}
+                                        </p>
+                                      </div>
+                                      <Badge
+                                        variant={
+                                          regulation.relevance > 90
+                                            ? "destructive"
+                                            : regulation.relevance > 80
+                                              ? "default"
+                                              : "outline"
+                                        }
+                                        className={
+                                          regulation.relevance > 90
+                                            ? "bg-red-500"
+                                            : regulation.relevance > 80
+                                              ? "bg-green-600"
+                                              : "border-green-500 text-green-700 bg-green-50"
+                                        }
+                                      >
+                                        {regulation.relevance}% Совпадение
+                                      </Badge>
+                                    </div>
+                                  ))}
+                              </div>
+                            </div>
+                          )
+                        )
+                      ) : (
+                        <div className="text-center py-8">
+                          <Info className="mx-auto h-12 w-12 text-green-400 opacity-50" />
+                          <h3 className="mt-4 text-lg font-medium text-green-800">
+                            Нет результатов
+                          </h3>
+                          <p className="mt-2 text-sm text-green-600">
+                            По выбранным фильтрам не найдено нормативных актов. Попробуйте изменить
+                            параметры фильтрации.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                <div className="mt-6 flex justify-end">
                   <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-green-600 text-green-700 hover:bg-green-100"
-                    onClick={resetFilters}
-                  >
-                    Сбросить
-                  </Button>
-                  <Button
-                    size="sm"
                     className="bg-green-600 hover:bg-green-700"
-                    onClick={applyFilters}
+                    onClick={handleDownloadReport}
+                    disabled={downloadReportMutation.isPending}
                   >
-                    Применить
+                    {downloadReportMutation.isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="mr-2 h-4 w-4" />
+                    )}
+                    Экспорт полного отчета
                   </Button>
                 </div>
               </CardContent>
             </Card>
           )}
-        </div>
 
-        <div className="lg:col-span-2">
-          {showDialogue ? (
-            <Card className="border-green-200 shadow-md h-full">
+          {showSuggestions && (
+            <Card className="border-green-200 shadow-md mt-6">
               <CardHeader className="bg-green-50 rounded-t-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-green-600" />
-                    <CardTitle className="text-green-800">Режим диалога</CardTitle>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-green-700 hover:bg-green-100"
-                    onClick={() => setShowDialogue(false)}
-                  >
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Вернуться к анализу
-                  </Button>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <CardTitle className="text-green-800">Предложения по улучшению</CardTitle>
                 </div>
                 <CardDescription className="text-green-700">
-                  Уточните детали вашего технического задания в режиме диалога
+                  Рекомендации по доработке технического задания для соответствия нормативным
+                  требованиям
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-6 flex flex-col h-[calc(100%-140px)]">
-                <ScrollArea className="flex-grow mb-4 pr-4">
-                  <div className="space-y-4">
-                    {dialogue.map(message => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
-                      >
-                        <div
-                          className={`max-w-[80%] rounded-lg p-3 ${
-                            message.sender === "user"
-                              ? "bg-green-600 text-white"
-                              : "bg-green-100 text-green-800"
-                          }`}
-                        >
-                          <p className="whitespace-pre-line">{message.message}</p>
+              <CardContent className="pt-6 space-y-4">
+                {mockSuggestions.map(suggestion => (
+                  <div
+                    key={suggestion.id}
+                    className="border border-green-200 rounded-lg p-4 space-y-2 hover:bg-green-50"
+                  >
+                    <div className="flex items-start gap-2">
+                      {suggestion.status === "critical" && (
+                        <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 shrink-0" />
+                      )}
+                      {suggestion.status === "warning" && (
+                        <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
+                      )}
+                      {suggestion.status === "info" && (
+                        <Clock className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+                      )}
+                      {suggestion.status === "success" && (
+                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
+                      )}
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-medium text-green-800">{suggestion.regulation}</h3>
+                          {suggestion.articles && (
+                            <span className="text-sm text-green-700">({suggestion.articles})</span>
+                          )}
+                        </div>
+                        <p className="text-sm text-green-700">→ {suggestion.requirement}</p>
+                        <div className="mt-2 flex items-center gap-2">
+                          <Badge
+                            className={
+                              suggestion.status === "critical"
+                                ? "bg-red-100 text-red-800 border-red-300"
+                                : suggestion.status === "warning"
+                                  ? "bg-amber-100 text-amber-800 border-amber-300"
+                                  : suggestion.status === "info"
+                                    ? "bg-blue-100 text-blue-800 border-blue-300"
+                                    : "bg-green-100 text-green-800 border-green-300"
+                            }
+                          >
+                            {suggestion.status === "critical" && "Критично"}
+                            {suggestion.status === "warning" && "Требует внимания"}
+                            {suggestion.status === "info" && "Информация"}
+                            {suggestion.status === "success" && "Соответствует"}
+                          </Badge>
+                          <span className="text-sm font-medium text-green-800">Рекомендация:</span>
+                          <span className="text-sm text-green-700">{suggestion.action}</span>
                         </div>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </ScrollArea>
-
-                <div className="flex gap-2 mt-auto">
-                  <Input
-                    placeholder="Введите ваш вопрос..."
-                    value={newMessage}
-                    onChange={e => setNewMessage(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && handleSendMessage()}
-                    className="border-green-300 focus-visible:ring-green-500"
-                  />
-                  <Button className="bg-green-600 hover:bg-green-700" onClick={handleSendMessage}>
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="mt-4 flex justify-end">
-                  <Button className="bg-green-600 hover:bg-green-700">
-                    <Download className="mr-2 h-4 w-4" />
-                    Экспорт готового документа
-                  </Button>
-                </div>
+                ))}
               </CardContent>
             </Card>
-          ) : (
-            <>
-              {filteredResults && (
-                <Card className="border-green-200 shadow-md">
-                  <CardHeader className="bg-green-50 rounded-t-lg">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-green-600" />
-                      <CardTitle className="text-green-800">Результаты анализа</CardTitle>
-                    </div>
-                    <CardDescription className="text-green-700">
-                      Нормативные документы, относящиеся к вашему техническому заданию
-                      {selectedRegulations.length > 0 &&
-                        ` (отфильтровано: ${selectedRegulations.length})`}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-6">
-                    <Tabs defaultValue="relevant" className="w-full">
-                      <TabsList className="mb-4 bg-green-100">
-                        <TabsTrigger
-                          value="relevant"
-                          className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
-                        >
-                          Релевантные НПА
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="sections"
-                          className="data-[state=active]:bg-green-600 data-[state=active]:text-white"
-                        >
-                          По разделам
-                        </TabsTrigger>
-                      </TabsList>
+          )}
 
-                      <TabsContent value="relevant" className="space-y-4">
-                        {filteredResults.length > 0 ? (
-                          filteredResults.map(regulation => (
-                            <div
-                              key={regulation.id}
-                              className="border border-green-200 rounded-lg p-4 space-y-3 hover:bg-green-50"
-                            >
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <h3 className="font-medium text-green-800">{regulation.title}</h3>
-                                  <p className="text-sm text-green-700">{regulation.description}</p>
-                                </div>
-                                <Badge
-                                  variant={
-                                    regulation.relevance > 90
-                                      ? "destructive"
-                                      : regulation.relevance > 80
-                                        ? "default"
-                                        : "outline"
-                                  }
-                                  className={
-                                    regulation.relevance > 90
-                                      ? "bg-red-500"
-                                      : regulation.relevance > 80
-                                        ? "bg-green-600"
-                                        : "border-green-500 text-green-700 bg-green-50"
-                                  }
-                                >
-                                  {regulation.relevance}% Совпадение
-                                </Badge>
-                              </div>
+          {!filteredResults && !isAnalyzing && (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center p-8">
+                <p className="text-green-700">
+                  Загрузите документ и начните анализ, чтобы увидеть результаты
+                </p>
+              </div>
+            </div>
+          )}
 
-                              <div className="flex flex-wrap gap-2">
-                                {regulation.sections.map(section => (
-                                  <Badge
-                                    key={section}
-                                    variant="secondary"
-                                    className="bg-green-100 text-green-800"
-                                  >
-                                    {section}
-                                  </Badge>
-                                ))}
-                              </div>
-
-                              <div className="flex justify-end gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="border-green-600 text-green-700 hover:bg-green-100"
-                                >
-                                  <Download className="mr-2 h-4 w-4" />
-                                  Сохранить
-                                </Button>
-                                <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                                  <MessageSquare className="mr-2 h-4 w-4" />
-                                  Консультация
-                                </Button>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-center py-8">
-                            <Info className="mx-auto h-12 w-12 text-green-400 opacity-50" />
-                            <h3 className="mt-4 text-lg font-medium text-green-800">
-                              Нет результатов
-                            </h3>
-                            <p className="mt-2 text-sm text-green-600">
-                              По выбранным фильтрам не найдено нормативных актов. Попробуйте
-                              изменить параметры фильтрации.
-                            </p>
-                          </div>
-                        )}
-                      </TabsContent>
-
-                      <TabsContent value="sections">
-                        <div className="space-y-6">
-                          {filteredResults.length > 0 ? (
-                            Array.from(new Set(filteredResults.flatMap(r => r.sections))).map(
-                              section => (
-                                <div key={section} className="space-y-3">
-                                  <h3 className="font-medium text-lg text-green-800 border-b border-green-200 pb-2">
-                                    {section}
-                                  </h3>
-                                  <div className="space-y-3">
-                                    {filteredResults
-                                      .filter(r => r.sections.includes(section))
-                                      .map(regulation => (
-                                        <div
-                                          key={regulation.id}
-                                          className="border border-green-200 rounded-lg p-3 flex justify-between items-center hover:bg-green-50"
-                                        >
-                                          <div>
-                                            <h4 className="font-medium text-green-800">
-                                              {regulation.title}
-                                            </h4>
-                                            <p className="text-sm text-green-700">
-                                              {regulation.description}
-                                            </p>
-                                          </div>
-                                          <Badge
-                                            variant={
-                                              regulation.relevance > 90
-                                                ? "destructive"
-                                                : regulation.relevance > 80
-                                                  ? "default"
-                                                  : "outline"
-                                            }
-                                            className={
-                                              regulation.relevance > 90
-                                                ? "bg-red-500"
-                                                : regulation.relevance > 80
-                                                  ? "bg-green-600"
-                                                  : "border-green-500 text-green-700 bg-green-50"
-                                            }
-                                          >
-                                            {regulation.relevance}% Совпадение
-                                          </Badge>
-                                        </div>
-                                      ))}
-                                  </div>
-                                </div>
-                              )
-                            )
-                          ) : (
-                            <div className="text-center py-8">
-                              <Info className="mx-auto h-12 w-12 text-green-400 opacity-50" />
-                              <h3 className="mt-4 text-lg font-medium text-green-800">
-                                Нет результатов
-                              </h3>
-                              <p className="mt-2 text-sm text-green-600">
-                                По выбранным фильтрам не найдено нормативных актов. Попробуйте
-                                изменить параметры фильтрации.
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-
-                    <div className="mt-6 flex justify-end">
-                      <Button className="bg-green-600 hover:bg-green-700">
-                        <Download className="mr-2 h-4 w-4" />
-                        Экспорт полного отчета
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {results && showSuggestions && (
-                <Card className="border-green-200 shadow-md mt-6">
-                  <CardHeader className="bg-green-50 rounded-t-lg">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      <CardTitle className="text-green-800">Предложения по улучшению</CardTitle>
-                    </div>
-                    <CardDescription className="text-green-700">
-                      Рекомендации по доработке технического задания для соответствия нормативным
-                      требованиям
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-6 space-y-4">
-                    {mockSuggestions.map(suggestion => (
-                      <div
-                        key={suggestion.id}
-                        className="border border-green-200 rounded-lg p-4 space-y-2 hover:bg-green-50"
-                      >
-                        <div className="flex items-start gap-2">
-                          {suggestion.status === "critical" && (
-                            <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 shrink-0" />
-                          )}
-                          {suggestion.status === "warning" && (
-                            <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
-                          )}
-                          {suggestion.status === "info" && (
-                            <Clock className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
-                          )}
-                          {suggestion.status === "success" && (
-                            <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
-                          )}
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-medium text-green-800">
-                                {suggestion.regulation}
-                              </h3>
-                              {suggestion.articles && (
-                                <span className="text-sm text-green-700">
-                                  ({suggestion.articles})
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-green-700">→ {suggestion.requirement}</p>
-                            <div className="mt-2 flex items-center gap-2">
-                              <Badge
-                                className={
-                                  suggestion.status === "critical"
-                                    ? "bg-red-100 text-red-800 border-red-300"
-                                    : suggestion.status === "warning"
-                                      ? "bg-amber-100 text-amber-800 border-amber-300"
-                                      : suggestion.status === "info"
-                                        ? "bg-blue-100 text-blue-800 border-blue-300"
-                                        : "bg-green-100 text-green-800 border-green-300"
-                                }
-                              >
-                                {suggestion.status === "critical" && "Критично"}
-                                {suggestion.status === "warning" && "Требует внимания"}
-                                {suggestion.status === "info" && "Информация"}
-                                {suggestion.status === "success" && "Соответствует"}
-                              </Badge>
-                              <span className="text-sm font-medium text-green-800">
-                                Рекомендация:
-                              </span>
-                              <span className="text-sm text-green-700">{suggestion.action}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    <div className="flex justify-end gap-2 mt-4">
-                      <Button
-                        variant="outline"
-                        className="border-green-600 text-green-700 hover:bg-green-100"
-                      >
-                        <MessageSquare className="mr-2 h-4 w-4" />
-                        Получить консультацию
-                      </Button>
-                      <Button className="bg-green-600 hover:bg-green-700">
-                        <Download className="mr-2 h-4 w-4" />
-                        Скачать рекомендации
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {!results && !isAnalyzing && (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center p-8">
-                    <p className="text-green-700">
-                      Загрузите документ и начните анализ, чтобы увидеть результаты
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {isAnalyzing && (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center p-8">
-                    <p className="text-green-700">Анализ вашего документа...</p>
-                  </div>
-                </div>
-              )}
-            </>
+          {isAnalyzing && (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center p-8 flex flex-col items-center">
+                <Loader2 className="h-12 w-12 animate-spin text-green-600 mb-4" />
+                <p className="text-green-700">Анализ вашего документа...</p>
+              </div>
+            </div>
           )}
         </div>
       </div>
