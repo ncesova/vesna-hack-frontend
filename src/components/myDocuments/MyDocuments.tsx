@@ -454,33 +454,33 @@ export default function MyDocuments() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto flex flex-col gap-4 px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
       {/* Хлебные крошки */}
       <Link
         to="/"
-        className="inline-flex items-center text-[var(--blue)] hover:text-[var(--blue-dark)]  transition-colors"
+        className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
         Вернуться на главную
       </Link>
       {/* Заголовок */}
       <div className="">
-        <h1 className="text-2xl font-bold text-[var(--slate-dark)] mb-2">Мои документы</h1>
-        <p className="text-[var(--slate)]">Просмотр и управление загруженными документами</p>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Мои документы</h1>
+        <p className="text-muted-foreground">Просмотр и управление загруженными документами</p>
       </div>
 
       {/* Секция с документами */}
       <div
         id="section-documents"
-        className="bg-white rounded-lg border border-[var(--slate-light)] p-6"
+        className="bg-white rounded-lg border border-primary shadow-md p-6"
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg text-center font-semibold text-[var(--slate-dark)]">
+          <h2 className="text-lg text-center font-semibold text-foreground">
             Загруженные документы
           </h2>
           <Input
             placeholder="Поиск документов..."
-            className="max-w-xs border-[var(--slate-light)]"
+            className="max-w-xs border-primary"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -490,7 +490,6 @@ export default function MyDocuments() {
           <TableHeader>
             <TableRow>
               <TableHead>Название документа</TableHead>
-              {/* <TableHead>Тип</TableHead> */}
               <TableHead>Дата загрузки</TableHead>
               <TableHead>Статус</TableHead>
               <TableHead>Размер</TableHead>
@@ -506,7 +505,7 @@ export default function MyDocuments() {
                   <span
                     className={`inline-flex px-3 py-1 rounded-full text-center text-sm ${
                       doc.status === "Проанализировано"
-                        ? "bg-green-50 text-green-600"
+                        ? "bg-primary/10 text-primary"
                         : "bg-yellow-50 text-yellow-600"
                     }`}
                   >
@@ -519,13 +518,13 @@ export default function MyDocuments() {
                     <Link
                       variant="ghost"
                       size="sm"
-                      className="hover:bg-[var(--slate-light)] flex justify-center items-center h-9 px-3 rounded-md"
+                      className="hover:bg-primary/10 flex justify-center items-center h-9 px-3 rounded-md"
                       to={`/analyze/${doc.id}`}
                     >
                       <Eye className="w-4 h-4" />
                     </Link>
                     <a
-                      className="hover:bg-[var(--slate-light)] cursor-pointer flex justify-center items-center h-9 px-3 rounded-md"
+                      className="hover:bg-primary/10 cursor-pointer flex justify-center items-center h-9 px-3 rounded-md"
                       href={doc.link}
                       download={doc.name}
                     >
@@ -534,7 +533,7 @@ export default function MyDocuments() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="hover:bg-[var(--slate-light)] hover:text-red-600"
+                      className="hover:bg-primary/10 hover:text-red-600"
                       onClick={() => handleDelete(doc.id)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -551,17 +550,17 @@ export default function MyDocuments() {
             <Button
               variant="outline"
               size="sm"
-              className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+              className="border-primary text-primary hover:bg-primary/10 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-muted-foreground">
               Страница {currentPage} из {totalPages}
             </span>
             <Button
-              className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+              className="border-primary text-primary hover:bg-primary/10 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               variant="outline"
               size="sm"
               onClick={() => handlePageChange(currentPage + 1)}
