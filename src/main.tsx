@@ -1,14 +1,16 @@
+import { ErrorComponent, RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 
-import "./styles.css";
+import NotFound from "@/components/404.tsx";
+import { Spinner } from "@/components/Spinner.tsx";
 import reportWebVitals from "./reportWebVitals.ts";
+import "./styles.css";
 
 // Create a new router instance
 const router = createRouter({
@@ -16,7 +18,14 @@ const router = createRouter({
   context: {
     ...TanstackQuery.getContext(),
   },
+  defaultPendingComponent: () => (
+    <div className={`p-2 text-2xl`}>
+      <Spinner />
+    </div>
+  ),
+  defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
   defaultPreload: "intent",
+  defaultNotFoundComponent: () => <NotFound />,
   scrollRestoration: true,
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
