@@ -1,4 +1,4 @@
-import { useDownloadReport } from "@/api/Document/DocumentApi";
+import { documentAnalysisOptions, useDownloadReport } from "@/api/Document/DocumentApi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,13 +23,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   AlertTriangle,
   ArrowLeft,
   Check,
   ChevronsUpDown,
-  Clock,
   Download,
   FileText,
   Filter,
@@ -38,7 +38,7 @@ import {
   Loader2,
   X,
 } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 const mockTzText =
   "Пример технического задания для новой системы управления данными клиентов с аутентификацией пользователей, шифрованием данных и облачным хранилищем. Система будет обрабатывать персональные данные, включая имена, адреса и платежные реквизиты.";
@@ -210,7 +210,11 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
 }
 
 function AnalyzePageContent({ id }: AnalyzePageProps) {
-  // const { data } = useSuspenseQuery(documentAnalysisOptions(id));
+  const { data } = useSuspenseQuery(documentAnalysisOptions(id));
+  const navigate = useNavigate({ from: "/analyze" });
+  if (!data || data.text === null) {
+    navigate({ to: "/my-documents" });
+  }
   const { downloadReportMutation } = useDownloadReport();
   //@ts-ignore
   const [showHighlights, setShowHighlights] = useState(true);
@@ -224,10 +228,45 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const documentText = mockTzText;
-  const regulations = mockResults;
-  const suggestions = mockSuggestions;
-  const highlights = mockHighlights;
+  const mockDocumentText = mockTzText;
+
+  const documentText = data?.text || mockDocumentText;
+
+  const regulations = data?.npas
+    ? data.npas.map((npa, index) => ({
+        id: index.toString(),
+        title: npa.source?.split("ПРИКАЗ")[1]
+          ? "ПРИКАЗ" + npa.source?.split("ПРИКАЗ")[1]?.replace(".docx", "")
+          : npa.source?.split("\\").pop()?.replace(".docx", "") || "Неизвестный документ",
+        description: "",
+        relevance: Math.round(npa.distancePercent),
+        sections: ["Соответствие требованиям"],
+        url: "#",
+      }))
+    : mockResults;
+
+  // Initialize filteredResults with actual regulations data
+  // This ensures we're using real data when available
+  useEffect(() => {
+    // Only update if we have data from API and filteredResults is still using mock data
+    if (data?.npas && filteredResults === mockResults) {
+      setFilteredResults(regulations);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.npas]);
+
+  const suggestions = data?.analyses || mockSuggestions;
+  const highlights = data?.analyses || mockHighlights;
+
+  // Set all highlights to use red color
+  const formattedHighlights = highlights
+    ? highlights.map(item => ({
+        ...item,
+        text: item.text || "",
+        bgColor: "#FF000033", // Light red background
+        borderColor: "#FF000080", // Red border
+      }))
+    : [];
 
   const filteredRegulations = searchTerm
     ? availableRegulations.filter(
@@ -272,63 +311,76 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
   // Обновленная функция рендеринга подсвеченного текста с использованием компонента Tooltip
   const renderHighlightedText = () => {
     // Исходный текст документа
-    const originalText = documentText;
+    const originalText = documentText || "";
 
     // Создаем массив фрагментов текста и подсветок
     type TextFragment = {
       type: "text" | "highlight";
       content: string;
-      highlight?: (typeof highlights)[0];
+      highlight?: any;
     };
 
     let fragments: TextFragment[] = [{ type: "text", content: originalText }];
 
-    // Сортируем подсветки по длине текста (от большего к меньшему)
-    const sortedHighlights = [...highlights].sort((a, b) => b.text.length - a.text.length);
+    if (formattedHighlights && formattedHighlights.length > 0) {
+      // Сортируем подсветки по длине текста (от большего к меньшему)
+      const sortedHighlights = [...formattedHighlights].sort(
+        (a, b) => b.text.length - a.text.length
+      );
 
-    // Обрабатываем каждую подсветку
-    sortedHighlights.forEach(highlight => {
-      // Создаем новый массив фрагментов на основе существующего
-      const newFragments: TextFragment[] = [];
+      // Обрабатываем каждую подсветку
+      sortedHighlights.forEach(highlight => {
+        // Создаем новый массив фрагментов на основе существующего
+        const newFragments: TextFragment[] = [];
 
-      fragments.forEach(fragment => {
-        if (fragment.type === "text") {
-          // Ищем вхождения подсвечиваемого текста в текущем фрагменте
-          const parts = fragment.content.split(highlight.text);
-
-          if (parts.length > 1) {
-            // Добавляем первую часть текста
-            if (parts[0]) {
-              newFragments.push({ type: "text", content: parts[0] });
+        fragments.forEach(fragment => {
+          if (fragment.type === "text") {
+            // Проверяем, что текст для подсветки существует
+            if (!highlight.text) {
+              newFragments.push(fragment);
+              return;
             }
 
-            // Добавляем части текста и подсветки
-            for (let i = 1; i < parts.length; i++) {
-              // Добавляем подсветку
-              newFragments.push({
-                type: "highlight",
-                content: highlight.text,
-                highlight,
-              });
+            // Для case-insensitive поиска создаем регулярное выражение
+            const regex = new RegExp(highlight.text, "i");
+            const matches = fragment.content.match(regex);
 
-              // Добавляем остаток текста, если он есть
-              if (parts[i]) {
-                newFragments.push({ type: "text", content: parts[i] });
+            if (matches && matches.length > 0) {
+              const parts = fragment.content.split(regex);
+
+              // Добавляем первую часть текста
+              if (parts[0]) {
+                newFragments.push({ type: "text", content: parts[0] });
               }
+
+              // Добавляем части текста и подсветки
+              for (let i = 1; i < parts.length; i++) {
+                // Добавляем подсветку с оригинальным текстом из документа
+                newFragments.push({
+                  type: "highlight",
+                  content: matches[0],
+                  highlight,
+                });
+
+                // Добавляем остаток текста, если он есть
+                if (parts[i]) {
+                  newFragments.push({ type: "text", content: parts[i] });
+                }
+              }
+            } else {
+              // Если нет вхождений, добавляем исходный фрагмент без изменений
+              newFragments.push(fragment);
             }
           } else {
-            // Если нет вхождений, добавляем исходный фрагмент без изменений
+            // Если это уже подсветка, добавляем без изменений
             newFragments.push(fragment);
           }
-        } else {
-          // Если это уже подсветка, добавляем без изменений
-          newFragments.push(fragment);
-        }
-      });
+        });
 
-      // Обновляем массив фрагментов
-      fragments = newFragments;
-    });
+        // Обновляем массив фрагментов
+        fragments = newFragments;
+      });
+    }
 
     return (
       <TooltipProvider delayDuration={0}>
@@ -344,8 +396,8 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
                     <TooltipTrigger asChild>
                       <span
                         style={{
-                          backgroundColor: highlight?.bgColor,
-                          borderColor: highlight?.borderColor,
+                          backgroundColor: highlight?.bgColor || "#FF000033",
+                          borderColor: highlight?.borderColor || "#FF000080",
                         }}
                         className="px-1 rounded border cursor-pointer hover:opacity-80"
                       >
@@ -360,9 +412,11 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
                     >
                       <div className="flex flex-col gap-1">
                         <p className="text-sm font-semibold text-primary">
-                          {highlight?.regulation}
+                          {highlight?.regulation || "Нормативный акт"}
                         </p>
-                        <p className="text-xs text-muted-foreground">{highlight?.explanation}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {highlight?.explanation || "Пояснение отсутствует"}
+                        </p>
                       </div>
                     </TooltipContent>
                   </Tooltip>
@@ -460,16 +514,16 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
                     onSelect={() => handleFilterChange(regulation.id)}
                     className="px-2 py-1 cursor-pointer"
                   >
-                    <div className="flex items-start justify-between space-x-4 w-full">
+                    <div className="flex items-start space-x-4 w-full">
                       <Checkbox
                         id={`regulation-${regulation.id}`}
                         checked={selectedRegulations.includes(regulation.id)}
                         className="mt-1 h-5 w-5 border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
-                      <div className="flex-1 justify-between items-start">
+                      <div className="flex-1">
                         <Label
                           htmlFor={`regulation-${regulation.id}`}
-                          className="text-sm w-full md:w-auto font-medium text-foreground"
+                          className="text-sm font-medium text-foreground"
                         >
                           {regulation.title}
                         </Label>
@@ -800,7 +854,7 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
             </Card>
           )}
 
-          {showSuggestions && (
+          {suggestions && suggestions.length > 0 && showSuggestions && (
             <Card className="border-primary shadow-md mt-6">
               <CardHeader className="bg-primary/10 py-2 rounded-t-lg">
                 <div className="flex items-center gap-2">
@@ -813,84 +867,53 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                {suggestions.map(suggestion => (
-                  <div
-                    key={suggestion.id}
-                    className="border border-primary rounded-lg p-4 space-y-2 hover:bg-primary/10"
-                  >
-                    <div className="flex items-start gap-2">
-                      {suggestion.status === "critical" && (
+                {suggestions.map(suggestion => {
+                  // Determine if this is from the API or mock data
+                  const isApiData = "text" in suggestion && "explanation" in suggestion;
+
+                  return (
+                    <div
+                      key={suggestion.id || ""}
+                      className="border border-primary rounded-lg p-4 space-y-2 hover:bg-primary/10"
+                    >
+                      <div className="flex items-start gap-2">
                         <AlertTriangle
                           style={{ color: "#FF0000" }}
                           className="h-5 w-5 mt-0.5 shrink-0"
                         />
-                      )}
-                      {suggestion.status === "warning" && (
-                        <AlertTriangle
-                          style={{ color: "#FFA500" }}
-                          className="h-5 w-5 mt-0.5 shrink-0"
-                        />
-                      )}
-                      {suggestion.status === "info" && (
-                        <Clock style={{ color: "#0000FF" }} className="h-5 w-5 mt-0.5 shrink-0" />
-                      )}
-                      {suggestion.status === "success" && (
-                        <Lightbulb
-                          style={{ color: "#008000" }}
-                          className="h-5 w-5 mt-0.5 shrink-0"
-                        />
-                      )}
-                      <div className="flex-1 w-full">
-                        <div className="flex items-center justify-between gap-2">
-                          <h3 className="font-medium text-foreground">{suggestion.regulation}</h3>
-                          {suggestion.articles && (
-                            <span className="text-sm text-foreground">({suggestion.articles})</span>
-                          )}
-                        </div>
-                        <p className="text-sm text-foreground">→ {suggestion.requirement}</p>
-                        <div className="mt-2 flex items-center gap-2 md:flex-row flex-col justify-start items-start">
-                          <Badge
-                            style={
-                              suggestion.status === "critical"
-                                ? {
-                                    backgroundColor: "#FFEBEE",
-                                    color: "#B71C1C",
-                                    borderColor: "#FFCDD2",
-                                  }
-                                : suggestion.status === "warning"
-                                  ? {
-                                      backgroundColor: "#FFF8E1",
-                                      color: "#F57F17",
-                                      borderColor: "#FFECB3",
-                                    }
-                                  : suggestion.status === "info"
-                                    ? {
-                                        backgroundColor: "#E3F2FD",
-                                        color: "#0D47A1",
-                                        borderColor: "#BBDEFB",
-                                      }
-                                    : {
-                                        backgroundColor: "#E8F5E9",
-                                        color: "#1B5E20",
-                                        borderColor: "#C8E6C9",
-                                      }
-                            }
-                            className="text-xs py-1 font-medium border px-2 rounded"
-                          >
-                            {suggestion.status === "critical" && "Критично"}
-                            {suggestion.status === "warning" && "Требует внимания"}
-                            {suggestion.status === "info" && "Информация"}
-                            {suggestion.status === "success" && "Соответствует"}
-                          </Badge>
-                          <span className="text-sm w font-medium text-foreground">
-                            Рекомендация:
-                          </span>
-                          <span className="text-sm text-foreground">{suggestion.action}</span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium text-foreground">
+                              {suggestion.regulation || ""}
+                            </h3>
+                          </div>
+                          <p className="text-sm text-foreground">
+                            →{" "}
+                            {isApiData
+                              ? suggestion.explanation
+                              : (suggestion as any).requirement || ""}
+                          </p>
+                          <div className="mt-2 flex items-center gap-2">
+                            <Badge
+                              style={{
+                                backgroundColor: "#FFEBEE",
+                                color: "#B71C1C",
+                                borderColor: "#FFCDD2",
+                              }}
+                              className="text-xs py-1 font-medium border px-2 rounded"
+                            >
+                              Важно
+                            </Badge>
+                            <span className="text-sm font-medium text-foreground">Текст:</span>
+                            <span className="text-sm text-foreground">
+                              {isApiData ? suggestion.text : (suggestion as any).action || ""}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           )}
