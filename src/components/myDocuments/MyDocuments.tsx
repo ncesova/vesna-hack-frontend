@@ -130,14 +130,76 @@ export default function MyDocuments() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
-                  Загрузка...
+                <TableCell colSpan={5} className="py-8">
+                  <div className="flex flex-col items-center justify-center space-y-4">
+                    <div className="h-8 w-8 animate-spin">
+                      <svg
+                        className="text-muted-foreground"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm text-muted-foreground animate-pulse">Загрузка...</span>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : documents.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
-                  Нет документов
+                <TableCell colSpan={5} className="py-8">
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    <svg
+                      className="h-12 w-12 text-muted-foreground"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    <p className="text-lg font-medium text-muted-foreground">
+                      Документы отсутствуют
+                    </p>
+                    <Link
+                      to={"/analyze"}
+                      className="text-sm text-primary hover:text-primary/80 transition-colors duration-200 flex items-center gap-2 px-4 py-2 rounded-md bg-secondary hover:bg-secondary/80"
+                    >
+                      Загрузите свой первый документ
+                      <svg
+                        className="w-4 h-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"
+                        />
+                      </svg>
+                    </Link>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (

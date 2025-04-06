@@ -461,16 +461,16 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
                     onSelect={() => handleFilterChange(regulation.id)}
                     className="px-2 py-1 cursor-pointer"
                   >
-                    <div className="flex items-start space-x-4 w-full">
+                    <div className="flex items-start justify-between space-x-4 w-full">
                       <Checkbox
                         id={`regulation-${regulation.id}`}
                         checked={selectedRegulations.includes(regulation.id)}
                         className="mt-1 h-5 w-5 border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
-                      <div className="flex-1">
+                      <div className="flex-1 justify-between items-start">
                         <Label
                           htmlFor={`regulation-${regulation.id}`}
-                          className="text-sm font-medium text-foreground"
+                          className="text-sm w-full md:w-auto font-medium text-foreground"
                         >
                           {regulation.title}
                         </Label>
@@ -841,15 +841,15 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
                           className="h-5 w-5 mt-0.5 shrink-0"
                         />
                       )}
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="flex-1 w-full">
+                        <div className="flex items-center justify-between gap-2">
                           <h3 className="font-medium text-foreground">{suggestion.regulation}</h3>
                           {suggestion.articles && (
                             <span className="text-sm text-foreground">({suggestion.articles})</span>
                           )}
                         </div>
                         <p className="text-sm text-foreground">→ {suggestion.requirement}</p>
-                        <div className="mt-2 flex items-center gap-2">
+                        <div className="mt-2 flex items-center gap-2 md:flex-row flex-col justify-start items-start">
                           <Badge
                             style={
                               suggestion.status === "critical"
@@ -883,7 +883,9 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
                             {suggestion.status === "info" && "Информация"}
                             {suggestion.status === "success" && "Соответствует"}
                           </Badge>
-                          <span className="text-sm font-medium text-foreground">Рекомендация:</span>
+                          <span className="text-sm w font-medium text-foreground">
+                            Рекомендация:
+                          </span>
                           <span className="text-sm text-foreground">{suggestion.action}</span>
                         </div>
                       </div>

@@ -36,22 +36,12 @@ export default function Header() {
             <span className="whitespace-nowrap">Система проверки ТЗ</span>
           </Link>
 
-          <nav className="flex flex-wrap items-center gap-2 md:gap-4 [@media(max-width:430px)]:hidden md:flex">
-            <Link to="/">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80"
-              >
-                <Home className="h-4 w-4 md:mr-2" />
-                <span className="hidden md:inline">Главная</span>
-              </Button>
-            </Link>
+          <nav className="flex flex-wrap items-center gap-2 md:gap-4 [@media(max-width:430px)]:hidden md:flex ">
             <Link to="/my-documents">
               <Button
                 variant="ghost"
                 size="sm"
-                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80"
+                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80 p-0"
               >
                 <FileText className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Мои документы</span>
@@ -61,7 +51,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80"
+                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80 p-0"
               >
                 <BarChart className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Анализ</span>
@@ -71,7 +61,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80"
+                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80 p-0"
               >
                 <BookOpen className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">База знаний</span>
