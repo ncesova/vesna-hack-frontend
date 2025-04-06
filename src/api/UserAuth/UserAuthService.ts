@@ -1,15 +1,9 @@
-import { $api, removeTokens, setTokens } from "@/api/api-clients";
+import { $api } from "@/api/api-clients";
 
 export interface UserRequestDTO {
   email: string;
   password: string;
   name: string;
-}
-
-export interface TokenResponseDTO {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
 }
 
 export interface UserResponseDTO {
@@ -32,23 +26,14 @@ export interface UserResponseDTO {
 }
 
 export default class UserAuthService {
-  static async login(data: Omit<UserRequestDTO, "name">): Promise<void> {
-    const response = await $api.post<TokenResponseDTO>("/user/auth/login", data);
-    const { accessToken, refreshToken } = response.data;
-    setTokens(accessToken, refreshToken);
+  static async login(data: Omit<UserRequestDTO, "name">): Promise<number> {
+    const response = await $api.post("/user/auth/login", data);
+    return response.status;
   }
 
-  static async register(data: UserRequestDTO): Promise<void> {
-    const response = await $api.post<TokenResponseDTO>("/user/auth/register", data);
-    const { accessToken, refreshToken } = response.data;
-    setTokens(accessToken, refreshToken);
-  }
-
-  static async refreshToken(refreshToken: string): Promise<TokenResponseDTO> {
-    const response = await $api.post<TokenResponseDTO>("/user/auth/refresh", { refreshToken });
-    const tokens = response.data;
-    setTokens(tokens.accessToken, tokens.refreshToken);
-    return tokens;
+  static async register(data: UserRequestDTO): Promise<number> {
+    const response = await $api.post("/user/auth/register", data);
+    return response.status;
   }
 
   static async getUser(): Promise<UserResponseDTO> {
@@ -56,12 +41,8 @@ export default class UserAuthService {
     return response.data;
   }
 
-  static async logout(): Promise<void> {
-    await $api.post("/user/auth/logout");
-    removeTokens();
-  }
-
-  static isAuthenticated(): boolean {
-    return !!localStorage.getItem("accessToken");
+  static async logout(): Promise<number> {
+    const response = await $api.post("/user/auth/logout");
+    return response.status;
   }
 }
