@@ -47,9 +47,6 @@ export function FileUpload() {
 
       if (file) {
         formData.append("file", file);
-      } else if (textContent) {
-        const textFile = new File([textContent], "text-input.txt", { type: "text/plain" });
-        formData.append("file", textFile);
       } else {
         toast.error("Пожалуйста, загрузите файл или введите текст");
         setIsUploading(false);
@@ -96,14 +93,14 @@ export function FileUpload() {
               {fileName ? fileName : "Перетащите документ сюда"}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              Поддерживаются форматы DOCX, PDF и TXT до 10МБ
+              Поддерживаются форматы .DOCX, .DOC до 10МБ
             </p>
           </div>
           <input
             type="file"
             id="file-upload"
             className="hidden"
-            accept=".docx,.pdf,.txt"
+            accept=".docx, .doc"
             onChange={handleFileChange}
           />
           <Button

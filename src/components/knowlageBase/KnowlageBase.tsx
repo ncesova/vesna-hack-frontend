@@ -164,7 +164,7 @@ export default function KnowlageBase() {
                 id="file-upload"
                 className="absolute opacity-0 w-full h-full m-0 cursor-pointer"
                 onChange={handleFileChange}
-                accept=".pdf,.doc,.docx"
+                accept=".doc,.docx"
                 disabled={isUploading}
               />
               {file === null ? (
