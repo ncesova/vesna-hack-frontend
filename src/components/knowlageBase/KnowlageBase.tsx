@@ -106,7 +106,7 @@ export default function KnowlageBase() {
     try {
       setIsRefreshing(true);
       // Здесь логика обновления данных
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Имитация запроса
+      await new Promise(resolve => setTimeout(resolve, 1000));
       // const response = await fetch('/api/refresh-npa');
       // const data = await response.json();
     } catch (error) {
@@ -116,9 +116,18 @@ export default function KnowlageBase() {
     }
   };
 
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = (values: FormValues) => {
     setRequestSend(true);
     console.log(values);
+    // fetch("/api/search-npa", {
+    //   method: "POST",
+    //   body: JSON.stringify(values),
+    // })
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     console.log(data);
+    //     setKnowlageBase(data);
+    //   });
   };
 
   useEffect(() => {
@@ -284,13 +293,13 @@ export default function KnowlageBase() {
                         </Badge>
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-primary hover:text-primary/80 hover:bg-primary/10"
+                        <Link
+                          to={doc.link}
+                          target="_blank"
+                          className="text-primary hover:bg-primary/10 px-4 py-2 rounded-md"
                         >
                           Просмотр
-                        </Button>
+                        </Link>
                       </td>
                     </tr>
                   ))}

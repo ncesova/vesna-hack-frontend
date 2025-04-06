@@ -9,6 +9,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "О персональных данных",
     lastUpdated: "15.05.2022",
     status: "Активный",
+    link: "https://www.consultant.ru/document/cons_doc_LAW_140620/",
   },
   {
     id: "2",
@@ -16,6 +17,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Информационная технология. Криптографическая защита информации.",
     lastUpdated: "03.11.2021",
     status: "Активный",
+    link: "https://www.gost.ru/wps/portal/pages/gost/home",
   },
   {
     id: "3",
@@ -23,6 +25,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Об электронной подписи",
     lastUpdated: "20.01.2023",
     status: "Активный",
+    link: "https://www.consultant.ru/document/cons_doc_LAW_140620/",
   },
   {
     id: "4",
@@ -30,6 +33,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Об утверждении Положения о средствах шифрования",
     lastUpdated: "12.08.2022",
     status: "Активный",
+    link: "https://www.fsb.ru/fsb/press/press-release/2022/08/12/378",
   },
   {
     id: "5",
@@ -37,6 +41,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Об информации, информационных технологиях и о защите информации",
     lastUpdated: "05.03.2023",
     status: "Активный",
+    link: "https://www.consultant.ru/document/cons_doc_LAW_140620/",
   },
   {
     id: "6",
@@ -45,6 +50,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
       "Защита информации. Требования к безопасности систем электронного документооборота",
     lastUpdated: "12.04.2024",
     status: "Активный",
+    link: "https://www.gost.ru/wps/portal/pages/gost/home",
   },
   {
     id: "7",
@@ -52,6 +58,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Требования по обеспечению безопасности значимых объектов КИИ",
     lastUpdated: "15.04.2024",
     status: "Активный",
+    link: "https://www.fstek.ru/documents/239",
   },
   {
     id: "8",
@@ -59,6 +66,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Гигиенические требования к персональным электронно-вычислительным машинам",
     lastUpdated: "10.04.2024",
     status: "Неактивный",
+    link: "https://www.rospotrebnadzor.ru/documents/details.php?ELEMENT_ID=12345",
   },
   {
     id: "9",
@@ -66,6 +74,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Информационная технология. Криптографическая защита информации. Блочные шифры",
     lastUpdated: "08.04.2024",
     status: "Активный",
+    link: "https://www.gost.ru/wps/portal/pages/gost/home",
   },
   {
     id: "10",
@@ -73,6 +82,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "О безопасности критической информационной инфраструктуры РФ",
     lastUpdated: "05.04.2024",
     status: "Активный",
+    link: "https://www.consultant.ru/document/cons_doc_LAW_140620/",
   },
   {
     id: "11",
@@ -80,6 +90,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Требования к средствам электронной подписи",
     lastUpdated: "01.04.2024",
     status: "Активный",
+    link: "https://www.fsb.ru/fsb/press/press-release/2024/04/01/796",
   },
   {
     id: "12",
@@ -87,6 +98,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Безопасность финансовых операций. Защита информации финансовых организаций",
     lastUpdated: "28.03.2024",
     status: "Активный",
+    link: "https://www.gost.ru/wps/portal/pages/gost/home",
   },
   {
     id: "13",
@@ -94,6 +106,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Требования к оператору электронного документооборота",
     lastUpdated: "25.03.2024",
     status: "Неактивный",
+    link: "https://www.minsvyaz.ru/press/486",
   },
   {
     id: "14",
@@ -101,6 +114,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Методы и средства обеспечения безопасности. Системы менеджмента ИБ",
     lastUpdated: "20.03.2024",
     status: "Активный",
+    link: "https://www.gost.ru/wps/portal/pages/gost/home",
   },
   {
     id: "15",
@@ -108,6 +122,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "О коммерческой тайне",
     lastUpdated: "18.03.2024",
     status: "Активный",
+    link: "https://www.consultant.ru/document/cons_doc_LAW_140620/",
   },
   {
     id: "16",
@@ -115,6 +130,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Информационная технология. Методы и средства обеспечения безопасности",
     lastUpdated: "15.03.2024",
     status: "Активный",
+    link: "https://www.gost.ru/wps/portal/pages/gost/home",
   },
   {
     id: "17",
@@ -122,6 +138,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Требования о защите информации, не составляющей государственную тайну",
     lastUpdated: "12.03.2024",
     status: "Активный",
+    link: "https://www.fstek.ru/documents/17",
   },
   {
     id: "18",
@@ -129,6 +146,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Защита информации. Разработка безопасного программного обеспечения",
     lastUpdated: "10.03.2024",
     status: "Активный",
+    link: "https://www.gost.ru/wps/portal/pages/gost/home",
   },
   {
     id: "19",
@@ -136,6 +154,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "О стандартизации в Российской Федерации",
     lastUpdated: "08.03.2024",
     status: "Активный",
+    link: "https://www.consultant.ru/document/cons_doc_LAW_140620/",
   },
   {
     id: "20",
@@ -143,6 +162,7 @@ export const knowlageBaseData: IKnowlageBase[] = [
     description: "Защита информации. Порядок создания автоматизированных систем",
     lastUpdated: "05.03.2024",
     status: "Активный",
+    link: "https://www.gost.ru/wps/portal/pages/gost/home",
   },
 ];
 
@@ -559,4 +579,3 @@ export const formControls: IFormControl[] = [
     type: "password",
   },
 ];
-
