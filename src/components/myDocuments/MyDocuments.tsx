@@ -1,3 +1,9 @@
+import {
+  useDeleteDocument,
+  useDownloadDocument,
+  useGetDocuments,
+} from "@/api/Document/DocumentApi";
+import { TechStatus } from "@/api/Document/DocumentService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,35 +14,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { testDocuments } from "@/shared/testData";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ChevronLeft, ChevronRight, Download, Eye, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import type { IDoc } from "./docTypes";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function MyDocuments() {
-  const [documents, setDocuments] = useState<IDoc[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
-  useEffect(() => {
-    setDocuments(testDocuments);
-  }, []);
 
-  const filteredDocuments = documents.filter(doc =>
-    doc.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const { data, isLoading, refetch } = useGetDocuments({
+    search: searchQuery,
+    size: itemsPerPage,
+    page: currentPage, // 1-based index
+  });
 
-  const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentDocuments = filteredDocuments.slice(startIndex, endIndex);
+  const { deleteMutation } = useDeleteDocument();
+  const { downloadMutation } = useDownloadDocument();
+
+  const documents = data?.technicalSpecs || [];
+  const totalDocuments = documents.length;
+  const totalPages = Math.max(1, Math.ceil(totalDocuments / itemsPerPage));
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     const section = document.getElementById("section-documents");
     if (section) {
-      // Добавляем небольшую задержку для надежного срабатывания
       setTimeout(() => {
         section.scrollIntoView({ behavior: "smooth" });
       }, 100);
@@ -44,18 +48,38 @@ export default function MyDocuments() {
   };
 
   const handleDelete = (id: string) => {
-    setDocuments(documents.filter(d => d.id !== id));
-    // return fetch(`/api/documents/${id}`, {
-    //   method: "DELETE",
-    // })
-    //   .then(res => {
-    //     if (res.ok) {
-    //       setDocuments(documents.filter(d => d.id !== id));
-    //     }
-    //   })
-    //   .catch(err => {
-    //     console.error("Ошибка при удалении документа:", err);
-    //   });
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success("Документ удален", {
+          description: "Документ был успешно удален",
+        });
+        refetch();
+      },
+      onError: () => {
+        toast.error("Ошибка", {
+          description: "Не удалось удалить документ",
+        });
+      },
+    });
+  };
+
+  const handleDownload = (id: string) => {
+    downloadMutation.mutate(id, {
+      onError: () => {
+        toast.error("Ошибка", {
+          description: "Не удалось скачать документ",
+        });
+      },
+    });
+  };
+
+  const getStatusText = (status: TechStatus) => {
+    return status === TechStatus.Completed ? "Проанализировано" : "В обработке";
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("ru-RU");
   };
 
   return (
@@ -99,55 +123,72 @@ export default function MyDocuments() {
               <TableHead>Название документа</TableHead>
               <TableHead>Дата загрузки</TableHead>
               <TableHead>Статус</TableHead>
-              <TableHead>Размер</TableHead>
+              <TableHead>Категория</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentDocuments.map(doc => (
-              <TableRow key={doc.id} className="relative">
-                <TableCell className="font-medium">{doc.name}</TableCell>
-                <TableCell>{doc.uploadDate}</TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex px-3 py-1 rounded-full text-center text-sm ${
-                      doc.status === "Проанализировано"
-                        ? "bg-primary/10 text-primary"
-                        : "bg-yellow-50 text-yellow-600"
-                    }`}
-                  >
-                    {doc.status}
-                  </span>
-                </TableCell>
-                <TableCell>{doc.size}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Link
-                      className="hover:bg-primary/10 flex justify-center items-center h-9 px-3 rounded-md"
-                      to={`/analyze/$id`}
-                      params={{ id: doc.id }}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Link>
-                    <a
-                      className="hover:bg-primary/10 cursor-pointer flex justify-center items-center h-9 px-3 rounded-md"
-                      href={doc.link}
-                      download={doc.name}
-                    >
-                      <Download className="w-4 h-4" />
-                    </a>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="hover:bg-primary/10 hover:text-red-600"
-                      onClick={() => handleDelete(doc.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  Загрузка...
                 </TableCell>
               </TableRow>
-            ))}
+            ) : documents.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  Нет документов
+                </TableCell>
+              </TableRow>
+            ) : (
+              documents.map(doc => (
+                <TableRow key={doc.id} className="relative">
+                  <TableCell className="font-medium">{doc.name}</TableCell>
+                  <TableCell>{formatDate(doc.lastUpdate)}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex px-3 py-1 rounded-full text-center text-sm ${
+                        doc.status === TechStatus.Completed
+                          ? "bg-primary/10 text-primary"
+                          : "bg-yellow-50 text-yellow-600"
+                      }`}
+                    >
+                      {getStatusText(doc.status)}
+                    </span>
+                  </TableCell>
+                  <TableCell>{doc.category || "—"}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Link
+                        className="hover:bg-primary/10 flex justify-center items-center h-9 px-3 rounded-md"
+                        to={`/analyze/$id`}
+                        params={{ id: doc.id }}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="hover:bg-primary/10"
+                        onClick={() => handleDownload(doc.id)}
+                        disabled={downloadMutation.isPending}
+                      >
+                        <Download className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="hover:bg-primary/10 hover:text-red-600"
+                        onClick={() => handleDelete(doc.id)}
+                        disabled={deleteMutation.isPending}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
 
@@ -158,7 +199,7 @@ export default function MyDocuments() {
               size="sm"
               className="border-primary text-primary hover:bg-primary/10 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              disabled={currentPage === 1 || isLoading}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -170,7 +211,7 @@ export default function MyDocuments() {
               variant="outline"
               size="sm"
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages || isLoading}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

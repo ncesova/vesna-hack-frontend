@@ -212,10 +212,15 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
 function AnalyzePageContent({ id }: AnalyzePageProps) {
   //const { data } = useSuspenseQuery(documentAnalysisOptions(id));
   const { downloadReportMutation } = useDownloadReport();
+  //@ts-ignore
   const [showHighlights, setShowHighlights] = useState(true);
+  //@ts-ignore
   const [showSuggestions, setShowSuggestions] = useState(true);
+  //@ts-ignore
   const [filteredResults, setFilteredResults] = useState<typeof mockResults | null>(mockResults);
+  //@ts-ignore
   const [selectedRegulations, setSelectedRegulations] = useState<string[]>([]);
+  //@ts-ignore
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
