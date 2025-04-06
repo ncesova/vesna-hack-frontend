@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { BookOpen, FileText, Home, LogOut, Menu, User, X } from "lucide-react";
+import { BarChart, BookOpen, FileText, Home, LogOut, Menu, User, X } from "lucide-react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -55,6 +55,16 @@ export default function Header() {
               >
                 <FileText className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Мои документы</span>
+              </Button>
+            </Link>
+            <Link to="/analyze">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="cursor-pointer flex items-center justify-center text-primary hover:bg-secondary/80"
+              >
+                <BarChart className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Анализ</span>
               </Button>
             </Link>
             <Link to="/knowledge-base">
@@ -140,6 +150,16 @@ export default function Header() {
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Мои документы
+                </Button>
+              </Link>
+              <Link to="/analyze" onClick={handleLinkClick}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-primary hover:bg-secondary-foreground/10 transition-colors duration-200"
+                >
+                  <BarChart className="h-4 w-4 mr-2" />
+                  Анализ
                 </Button>
               </Link>
               <Link to="/knowledge-base" onClick={handleLinkClick}>
