@@ -123,7 +123,6 @@ export default function MyDocuments() {
               <TableHead>Название документа</TableHead>
               <TableHead>Дата загрузки</TableHead>
               <TableHead>Статус</TableHead>
-              <TableHead>Категория</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -218,7 +217,6 @@ export default function MyDocuments() {
                       {getStatusText(doc.status)}
                     </span>
                   </TableCell>
-                  <TableCell>{doc.category || "—"}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Link
