@@ -1,7 +1,7 @@
 import AnalyzePage from "@/components/analyze/analyze-id-page";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/analyze/$id")({
+export const Route = createFileRoute("/_mainLayout/analyze/$id")({
   component: RouteComponent,
 });
 

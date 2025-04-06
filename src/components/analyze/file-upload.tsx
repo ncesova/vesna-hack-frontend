@@ -1,10 +1,11 @@
 import type React from "react";
 
-import { useAnalyze } from "@/api/Analyze/AnalyzeApi";
+import { useUploadDocument } from "@/api/Document/DocumentApi";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useNavigate } from "@tanstack/react-router";
 import { FileText, Upload } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,7 +15,12 @@ export function FileUpload() {
   const [textContent, setTextContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const { analyzeMutation } = useAnalyze();
+  const { uploadMutation } = useUploadDocument();
+  //TODO: get user id from auth context
+  // const { data: user } = useSuspenseQuery(userAuthOptions());
+  const userId = "1";
+
+  const navigate = useNavigate({ from: "/analyze" });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -22,7 +28,6 @@ export function FileUpload() {
       setFileName(selectedFile.name);
       setFile(selectedFile);
 
-      // For preview purposes only (optional)
       if (selectedFile.type === "text/plain") {
         const reader = new FileReader();
         reader.onload = event => {
@@ -40,12 +45,9 @@ export function FileUpload() {
       setIsUploading(true);
       const formData = new FormData();
 
-      // If a file was selected, add it to the FormData
       if (file) {
         formData.append("file", file);
-      }
-      // If text was entered, create a text file and add it
-      else if (textContent) {
+      } else if (textContent) {
         const textFile = new File([textContent], "text-input.txt", { type: "text/plain" });
         formData.append("file", textFile);
       } else {
@@ -54,22 +56,13 @@ export function FileUpload() {
         return;
       }
 
-      // Add any other required fields - assuming there's a logged-in user
-      // You may need to adjust this based on your application's auth state
-      const userId = "1"; // Replace with actual user ID from your auth context
-
-      // Call the API to analyze the content
-      await analyzeMutation.mutateAsync({
+      const id = await uploadMutation.mutateAsync({
         userId,
-        files: formData,
+        file: formData.get("file") as File,
       });
 
       toast.success("Документ принят на обработку");
-
-      // Optionally reset the form
-      // setFile(null);
-      // setFileName(null);
-      // setTextContent("");
+      navigate({ to: "/analyze/$id", params: { id } });
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Не удалось загрузить документ. Пожалуйста, попробуйте еще раз.");

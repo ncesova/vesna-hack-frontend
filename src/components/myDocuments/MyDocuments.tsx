@@ -62,11 +62,11 @@ export default function MyDocuments() {
     <div className="container mx-auto px-4 py-8">
       {/* Хлебные крошки */}
       <Link
-        to="/"
+        to="/analyze"
         className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Вернуться на главную
+        Вернуться к загрузке
       </Link>
       {/* Заголовок */}
       <div className="mb-6">
@@ -123,10 +123,9 @@ export default function MyDocuments() {
                 <TableCell>
                   <div className="flex gap-2">
                     <Link
-                      variant="ghost"
-                      size="sm"
                       className="hover:bg-primary/10 flex justify-center items-center h-9 px-3 rounded-md"
-                      to={`/analyze/${doc.id}`}
+                      to={`/analyze/$id`}
+                      params={{ id: doc.id }}
                     >
                       <Eye className="w-4 h-4" />
                     </Link>

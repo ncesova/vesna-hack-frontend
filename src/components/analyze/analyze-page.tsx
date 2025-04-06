@@ -1,4 +1,4 @@
-import { userAuthOptions } from "@/api/UserAuth/UserAuthApi";
+import { FileUpload } from "@/components/analyze/file-upload";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,13 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileUpload } from "@/components/analyze/file-upload";
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { BookOpen, FileText } from "lucide-react";
 
 export default function Home() {
-  const { data } = useQuery(userAuthOptions());
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col items-center justify-center space-y-8">
@@ -64,7 +61,7 @@ export default function Home() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Link to="/acts" className="w-full">
+              <Link to="/knowledge-base" className="w-full">
                 <Button
                   variant="outline"
                   className="w-full border-primary text-primary hover:bg-secondary"

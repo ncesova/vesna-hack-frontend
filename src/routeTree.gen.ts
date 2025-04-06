@@ -11,27 +11,15 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as MyDocumentsImport } from './routes/my-documents'
-import { Route as KnowledgeBaseImport } from './routes/knowledge-base'
 import { Route as AuthImport } from './routes/auth'
-import { Route as ActsImport } from './routes/acts'
+import { Route as MainLayoutImport } from './routes/_mainLayout'
 import { Route as IndexImport } from './routes/index'
-import { Route as AnalyzeIndexImport } from './routes/analyze.index'
-import { Route as AnalyzeIdImport } from './routes/analyze.$id'
+import { Route as MainLayoutMyDocumentsImport } from './routes/_mainLayout/my-documents'
+import { Route as MainLayoutKnowledgeBaseImport } from './routes/_mainLayout/knowledge-base'
+import { Route as MainLayoutAnalyzeIndexImport } from './routes/_mainLayout/analyze.index'
+import { Route as MainLayoutAnalyzeIdImport } from './routes/_mainLayout/analyze.$id'
 
 // Create/Update Routes
-
-const MyDocumentsRoute = MyDocumentsImport.update({
-  id: '/my-documents',
-  path: '/my-documents',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const KnowledgeBaseRoute = KnowledgeBaseImport.update({
-  id: '/knowledge-base',
-  path: '/knowledge-base',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const AuthRoute = AuthImport.update({
   id: '/auth',
@@ -39,9 +27,8 @@ const AuthRoute = AuthImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ActsRoute = ActsImport.update({
-  id: '/acts',
-  path: '/acts',
+const MainLayoutRoute = MainLayoutImport.update({
+  id: '/_mainLayout',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -51,16 +38,28 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AnalyzeIndexRoute = AnalyzeIndexImport.update({
-  id: '/analyze/',
-  path: '/analyze/',
-  getParentRoute: () => rootRoute,
+const MainLayoutMyDocumentsRoute = MainLayoutMyDocumentsImport.update({
+  id: '/my-documents',
+  path: '/my-documents',
+  getParentRoute: () => MainLayoutRoute,
 } as any)
 
-const AnalyzeIdRoute = AnalyzeIdImport.update({
+const MainLayoutKnowledgeBaseRoute = MainLayoutKnowledgeBaseImport.update({
+  id: '/knowledge-base',
+  path: '/knowledge-base',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+
+const MainLayoutAnalyzeIndexRoute = MainLayoutAnalyzeIndexImport.update({
+  id: '/analyze/',
+  path: '/analyze/',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+
+const MainLayoutAnalyzeIdRoute = MainLayoutAnalyzeIdImport.update({
   id: '/analyze/$id',
   path: '/analyze/$id',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => MainLayoutRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -74,11 +73,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/acts': {
-      id: '/acts'
-      path: '/acts'
-      fullPath: '/acts'
-      preLoaderRoute: typeof ActsImport
+    '/_mainLayout': {
+      id: '/_mainLayout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MainLayoutImport
       parentRoute: typeof rootRoute
     }
     '/auth': {
@@ -88,75 +87,93 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
-    '/knowledge-base': {
-      id: '/knowledge-base'
+    '/_mainLayout/knowledge-base': {
+      id: '/_mainLayout/knowledge-base'
       path: '/knowledge-base'
       fullPath: '/knowledge-base'
-      preLoaderRoute: typeof KnowledgeBaseImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof MainLayoutKnowledgeBaseImport
+      parentRoute: typeof MainLayoutImport
     }
-    '/my-documents': {
-      id: '/my-documents'
+    '/_mainLayout/my-documents': {
+      id: '/_mainLayout/my-documents'
       path: '/my-documents'
       fullPath: '/my-documents'
-      preLoaderRoute: typeof MyDocumentsImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof MainLayoutMyDocumentsImport
+      parentRoute: typeof MainLayoutImport
     }
-    '/analyze/$id': {
-      id: '/analyze/$id'
+    '/_mainLayout/analyze/$id': {
+      id: '/_mainLayout/analyze/$id'
       path: '/analyze/$id'
       fullPath: '/analyze/$id'
-      preLoaderRoute: typeof AnalyzeIdImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof MainLayoutAnalyzeIdImport
+      parentRoute: typeof MainLayoutImport
     }
-    '/analyze/': {
-      id: '/analyze/'
+    '/_mainLayout/analyze/': {
+      id: '/_mainLayout/analyze/'
       path: '/analyze'
       fullPath: '/analyze'
-      preLoaderRoute: typeof AnalyzeIndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof MainLayoutAnalyzeIndexImport
+      parentRoute: typeof MainLayoutImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface MainLayoutRouteChildren {
+  MainLayoutKnowledgeBaseRoute: typeof MainLayoutKnowledgeBaseRoute
+  MainLayoutMyDocumentsRoute: typeof MainLayoutMyDocumentsRoute
+  MainLayoutAnalyzeIdRoute: typeof MainLayoutAnalyzeIdRoute
+  MainLayoutAnalyzeIndexRoute: typeof MainLayoutAnalyzeIndexRoute
+}
+
+const MainLayoutRouteChildren: MainLayoutRouteChildren = {
+  MainLayoutKnowledgeBaseRoute: MainLayoutKnowledgeBaseRoute,
+  MainLayoutMyDocumentsRoute: MainLayoutMyDocumentsRoute,
+  MainLayoutAnalyzeIdRoute: MainLayoutAnalyzeIdRoute,
+  MainLayoutAnalyzeIndexRoute: MainLayoutAnalyzeIndexRoute,
+}
+
+const MainLayoutRouteWithChildren = MainLayoutRoute._addFileChildren(
+  MainLayoutRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/acts': typeof ActsRoute
+  '': typeof MainLayoutRouteWithChildren
   '/auth': typeof AuthRoute
-  '/knowledge-base': typeof KnowledgeBaseRoute
-  '/my-documents': typeof MyDocumentsRoute
-  '/analyze/$id': typeof AnalyzeIdRoute
-  '/analyze': typeof AnalyzeIndexRoute
+  '/knowledge-base': typeof MainLayoutKnowledgeBaseRoute
+  '/my-documents': typeof MainLayoutMyDocumentsRoute
+  '/analyze/$id': typeof MainLayoutAnalyzeIdRoute
+  '/analyze': typeof MainLayoutAnalyzeIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/acts': typeof ActsRoute
+  '': typeof MainLayoutRouteWithChildren
   '/auth': typeof AuthRoute
-  '/knowledge-base': typeof KnowledgeBaseRoute
-  '/my-documents': typeof MyDocumentsRoute
-  '/analyze/$id': typeof AnalyzeIdRoute
-  '/analyze': typeof AnalyzeIndexRoute
+  '/knowledge-base': typeof MainLayoutKnowledgeBaseRoute
+  '/my-documents': typeof MainLayoutMyDocumentsRoute
+  '/analyze/$id': typeof MainLayoutAnalyzeIdRoute
+  '/analyze': typeof MainLayoutAnalyzeIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/acts': typeof ActsRoute
+  '/_mainLayout': typeof MainLayoutRouteWithChildren
   '/auth': typeof AuthRoute
-  '/knowledge-base': typeof KnowledgeBaseRoute
-  '/my-documents': typeof MyDocumentsRoute
-  '/analyze/$id': typeof AnalyzeIdRoute
-  '/analyze/': typeof AnalyzeIndexRoute
+  '/_mainLayout/knowledge-base': typeof MainLayoutKnowledgeBaseRoute
+  '/_mainLayout/my-documents': typeof MainLayoutMyDocumentsRoute
+  '/_mainLayout/analyze/$id': typeof MainLayoutAnalyzeIdRoute
+  '/_mainLayout/analyze/': typeof MainLayoutAnalyzeIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/acts'
+    | ''
     | '/auth'
     | '/knowledge-base'
     | '/my-documents'
@@ -165,7 +182,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/acts'
+    | ''
     | '/auth'
     | '/knowledge-base'
     | '/my-documents'
@@ -174,33 +191,25 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/acts'
+    | '/_mainLayout'
     | '/auth'
-    | '/knowledge-base'
-    | '/my-documents'
-    | '/analyze/$id'
-    | '/analyze/'
+    | '/_mainLayout/knowledge-base'
+    | '/_mainLayout/my-documents'
+    | '/_mainLayout/analyze/$id'
+    | '/_mainLayout/analyze/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ActsRoute: typeof ActsRoute
+  MainLayoutRoute: typeof MainLayoutRouteWithChildren
   AuthRoute: typeof AuthRoute
-  KnowledgeBaseRoute: typeof KnowledgeBaseRoute
-  MyDocumentsRoute: typeof MyDocumentsRoute
-  AnalyzeIdRoute: typeof AnalyzeIdRoute
-  AnalyzeIndexRoute: typeof AnalyzeIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ActsRoute: ActsRoute,
+  MainLayoutRoute: MainLayoutRouteWithChildren,
   AuthRoute: AuthRoute,
-  KnowledgeBaseRoute: KnowledgeBaseRoute,
-  MyDocumentsRoute: MyDocumentsRoute,
-  AnalyzeIdRoute: AnalyzeIdRoute,
-  AnalyzeIndexRoute: AnalyzeIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -214,34 +223,40 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/acts",
-        "/auth",
-        "/knowledge-base",
-        "/my-documents",
-        "/analyze/$id",
-        "/analyze/"
+        "/_mainLayout",
+        "/auth"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/acts": {
-      "filePath": "acts.tsx"
+    "/_mainLayout": {
+      "filePath": "_mainLayout.tsx",
+      "children": [
+        "/_mainLayout/knowledge-base",
+        "/_mainLayout/my-documents",
+        "/_mainLayout/analyze/$id",
+        "/_mainLayout/analyze/"
+      ]
     },
     "/auth": {
       "filePath": "auth.tsx"
     },
-    "/knowledge-base": {
-      "filePath": "knowledge-base.tsx"
+    "/_mainLayout/knowledge-base": {
+      "filePath": "_mainLayout/knowledge-base.tsx",
+      "parent": "/_mainLayout"
     },
-    "/my-documents": {
-      "filePath": "my-documents.tsx"
+    "/_mainLayout/my-documents": {
+      "filePath": "_mainLayout/my-documents.tsx",
+      "parent": "/_mainLayout"
     },
-    "/analyze/$id": {
-      "filePath": "analyze.$id.tsx"
+    "/_mainLayout/analyze/$id": {
+      "filePath": "_mainLayout/analyze.$id.tsx",
+      "parent": "/_mainLayout"
     },
-    "/analyze/": {
-      "filePath": "analyze.index.tsx"
+    "/_mainLayout/analyze/": {
+      "filePath": "_mainLayout/analyze.index.tsx",
+      "parent": "/_mainLayout"
     }
   }
 }

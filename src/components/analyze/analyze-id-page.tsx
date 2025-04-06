@@ -1,4 +1,4 @@
-import { useDownloadReport } from "@/api/Analyze/AnalyzeApi";
+import { useDownloadReport } from "@/api/Document/DocumentApi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -37,7 +38,7 @@ import {
   Loader2,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 const mockTzText =
   "Пример технического задания для новой системы управления данными клиентов с аутентификацией пользователей, шифрованием данных и облачным хранилищем. Система будет обрабатывать персональные данные, включая имена, адреса и платежные реквизиты.";
@@ -191,20 +192,38 @@ interface AnalyzePageProps {
 }
 
 export default function AnalyzePage({ id }: AnalyzePageProps) {
-  // Comment out unused variables for now - will be used when API integration is complete
-  // const { data, isLoading } = useQuery(analyzeResultOptions(id));
-  // const { analyzeMutation } = useAnalyze();
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="text-primary font-medium">Загрузка анализа документа...</p>
+            <Progress value={45} className="w-[60%] max-w-md" />
+          </div>
+        </div>
+      }
+    >
+      <AnalyzePageContent id={id} />
+    </Suspense>
+  );
+}
+
+function AnalyzePageContent({ id }: AnalyzePageProps) {
+  //const { data } = useSuspenseQuery(documentAnalysisOptions(id));
   const { downloadReportMutation } = useDownloadReport();
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showSummary, setShowSummary] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [showHighlights, setShowHighlights] = useState(false);
-  const [filteredResults, setFilteredResults] = useState<typeof mockResults | null>(null);
+  const [showHighlights, setShowHighlights] = useState(true);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+  const [filteredResults, setFilteredResults] = useState<typeof mockResults | null>(mockResults);
   const [selectedRegulations, setSelectedRegulations] = useState<string[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Отфильтрованные регуляции по поисковому запросу
+  const documentText = mockTzText;
+  const regulations = mockResults;
+  const suggestions = mockSuggestions;
+  const highlights = mockHighlights;
+
   const filteredRegulations = searchTerm
     ? availableRegulations.filter(
         reg =>
@@ -213,28 +232,6 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
       )
     : availableRegulations;
 
-  // Имитация процесса анализа
-  const startAnalysis = () => {
-    setIsAnalyzing(true);
-
-    // Здесь будет вызов API для анализа
-    // Например:
-    // analyzeMutation.mutate({
-    //   userId: "user123",
-    //   files: formData
-    // });
-
-    // Временная имитация
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setShowSummary(true);
-      setShowSuggestions(true);
-      setShowHighlights(true);
-      setFilteredResults(mockResults);
-    }, 3000);
-  };
-
-  // Обработка фильтрации НПА
   const handleFilterChange = (id: string) => {
     setSelectedRegulations(prev => {
       if (prev.includes(id)) {
@@ -248,10 +245,10 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
   // Применение фильтров
   const applyFilters = () => {
     if (selectedRegulations.length === 0) {
-      setFilteredResults(mockResults);
+      setFilteredResults(regulations);
     } else {
       setFilteredResults(
-        mockResults?.filter(item => selectedRegulations.includes(item.id)) || null
+        regulations?.filter(item => selectedRegulations.includes(item.id)) || null
       );
     }
   };
@@ -259,7 +256,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
   // Сброс фильтров
   const resetFilters = () => {
     setSelectedRegulations([]);
-    setFilteredResults(mockResults);
+    setFilteredResults(regulations);
   };
 
   // Функция для скачивания полного отчета
@@ -270,19 +267,19 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
   // Обновленная функция рендеринга подсвеченного текста с использованием компонента Tooltip
   const renderHighlightedText = () => {
     // Исходный текст документа
-    const originalText = mockTzText;
+    const originalText = documentText;
 
     // Создаем массив фрагментов текста и подсветок
     type TextFragment = {
       type: "text" | "highlight";
       content: string;
-      highlight?: (typeof mockHighlights)[0];
+      highlight?: (typeof highlights)[0];
     };
 
     let fragments: TextFragment[] = [{ type: "text", content: originalText }];
 
     // Сортируем подсветки по длине текста (от большего к меньшему)
-    const sortedHighlights = [...mockHighlights].sort((a, b) => b.text.length - a.text.length);
+    const sortedHighlights = [...highlights].sort((a, b) => b.text.length - a.text.length);
 
     // Обрабатываем каждую подсветку
     sortedHighlights.forEach(highlight => {
@@ -507,9 +504,12 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Link to="/" className="flex items-center text-sm mb-6 hover:underline text-primary">
+      <Link
+        to="/my-documents"
+        className="flex items-center text-sm mb-6 hover:underline text-primary"
+      >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Вернуться на главную
+        Вернуться ко всем документам
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -529,27 +529,14 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                 <div className="p-4 bg-primary/10 rounded-md min-h-[300px]">
                   <p className="text-sm text-foreground">
                     {/* Здесь будет отображаться содержимое документа */}
-                    {mockTzText}
+                    {documentText}
                   </p>
                 </div>
               ) : (
                 renderHighlightedText()
               )}
 
-              {!isAnalyzing && !showSummary && (
-                <Button onClick={startAnalysis} className="w-full bg-primary hover:bg-primary">
-                  Начать анализ
-                </Button>
-              )}
-
-              {isAnalyzing && (
-                <div className="flex justify-center items-center py-4">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <span className="ml-2 text-primary">Анализ документа...</span>
-                </div>
-              )}
-
-              {showSummary && <div className="flex justify-between">{filterButton}</div>}
+              {!isFilterOpen && <div className="flex justify-between">{filterButton}</div>}
             </CardContent>
           </Card>
 
@@ -821,7 +808,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                {mockSuggestions.map(suggestion => (
+                {suggestions.map(suggestion => (
                   <div
                     key={suggestion.id}
                     className="border border-primary rounded-lg p-4 space-y-2 hover:bg-primary/10"
@@ -901,21 +888,19 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
             </Card>
           )}
 
-          {!filteredResults && !isAnalyzing && (
+          {!filteredResults && !isFilterOpen && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center p-8">
-                <p className="text-primary">
-                  Загрузите документ и начните анализ, чтобы увидеть результаты
-                </p>
+                <p className="text-primary">Результаты анализа документа недоступны</p>
               </div>
             </div>
           )}
 
-          {isAnalyzing && (
+          {isFilterOpen && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center p-8 flex flex-col items-center">
                 <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-                <p className="text-primary">Анализ вашего документа...</p>
+                <p className="text-primary">Загрузка фильтров...</p>
               </div>
             </div>
           )}
