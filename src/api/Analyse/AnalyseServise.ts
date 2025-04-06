@@ -20,9 +20,7 @@ export interface NpaBusiness {
 
 export default class AnalyseService {
   static async getDocumentAnalysis(id: string): Promise<DocumentAnalysBusiness> {
-    const response = await $api.get<DocumentAnalysBusiness>(
-      `/api/v1/TechnicalSpecification/${id}/analys`
-    );
+    const response = await $api.get<DocumentAnalysBusiness>(`/TechnicalSpecification/${id}/analys`);
     return response.data;
   }
 }

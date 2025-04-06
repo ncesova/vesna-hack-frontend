@@ -1,4 +1,4 @@
-import { useDownloadReport } from "@/api/Document/DocumentApi";
+import { documentAnalysisOptions, useDownloadReport } from "@/api/Document/DocumentApi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +23,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
@@ -210,7 +211,7 @@ export default function AnalyzePage({ id }: AnalyzePageProps) {
 }
 
 function AnalyzePageContent({ id }: AnalyzePageProps) {
-  //const { data } = useSuspenseQuery(documentAnalysisOptions(id));
+  const { data } = useSuspenseQuery(documentAnalysisOptions(id));
   const { downloadReportMutation } = useDownloadReport();
   //@ts-ignore
   const [showHighlights, setShowHighlights] = useState(true);

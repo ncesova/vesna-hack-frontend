@@ -54,7 +54,7 @@ export default class AnalyzeService {
     const formData = new FormData();
     formData.append("fileStream", file);
 
-    const response = await $api.post("/api/v1/TechnicalSpecification", formData, {
+    const response = await $api.post("/TechnicalSpecification", formData, {
       params: { userId },
       headers: {
         "Content-Type": "multipart/form-data",
@@ -66,37 +66,32 @@ export default class AnalyzeService {
   static async getDocuments(
     params: GetTechnicalSpecsRequestDTO = {}
   ): Promise<GetTechnicalSpecsResponseDTO> {
-    const response = await $api.get<GetTechnicalSpecsResponseDTO>(
-      "/api/v1/TechnicalSpecification",
-      {
-        params: {
-          Search: params.search,
-          Size: params.size,
-          Page: params.page,
-        },
-      }
-    );
+    const response = await $api.get<GetTechnicalSpecsResponseDTO>("/TechnicalSpecification", {
+      params: {
+        Search: params.search,
+        Size: params.size,
+        Page: params.page,
+      },
+    });
     return response.data;
   }
 
   static async getDocumentById(id: string): Promise<TechnicalSpecDto> {
-    const response = await $api.get<TechnicalSpecDto>(`/api/v1/TechnicalSpecification/${id}`);
+    const response = await $api.get<TechnicalSpecDto>(`/TechnicalSpecification/${id}`);
     return response.data;
   }
 
   static async getDocumentAnalysis(id: string): Promise<DocumentAnalysBusiness> {
-    const response = await $api.get<DocumentAnalysBusiness>(
-      `/api/v1/TechnicalSpecification/${id}/analys`
-    );
+    const response = await $api.get<DocumentAnalysBusiness>(`/TechnicalSpecification/${id}/analys`);
     return response.data;
   }
 
   static async downloadDocument(id: string): Promise<void> {
-    await $api.post(`/api/v1/TechnicalSpecification/${id}/file`);
+    await $api.post(`/TechnicalSpecification/${id}/file`);
   }
 
   static async deleteDocument(id: string): Promise<void> {
-    await $api.delete("/api/v1/TechnicalSpecification", {
+    await $api.delete("/TechnicalSpecification", {
       params: { id },
     });
   }
