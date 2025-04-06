@@ -541,7 +541,7 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
                 renderHighlightedText()
               )}
 
-              {!isFilterOpen && <div className="flex justify-between">{filterButton}</div>}
+              <div className="flex justify-between">{filterButton}</div>
             </CardContent>
           </Card>
 
@@ -897,15 +897,6 @@ function AnalyzePageContent({ id }: AnalyzePageProps) {
             <div className="flex items-center justify-center h-full">
               <div className="text-center p-8">
                 <p className="text-primary">Результаты анализа документа недоступны</p>
-              </div>
-            </div>
-          )}
-
-          {isFilterOpen && (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center p-8 flex flex-col items-center">
-                <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-                <p className="text-primary">Загрузка фильтров...</p>
               </div>
             </div>
           )}
