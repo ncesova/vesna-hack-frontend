@@ -2,7 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { knowlageBaseData } from "@/shared/testData";
+// import { knowlageBaseData } from "@/shared/testData";
+import NpaService from "@/api/NPA/NpaServise";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "@tanstack/react-router";
 import {
@@ -21,7 +22,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Form, FormControl, FormItem, FormLabel, FormMessage } from "../ui/form";
 import type { IKnowlageBase } from "./knowlageBaseTypes";
-
 // Определяем схему валидации
 const formSchema = z.object({
   query: z.string().min(2, {
@@ -41,17 +41,20 @@ export default function KnowlageBase() {
   const [requestSend, setRequestSend] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const itemsPerPage = 15;
+  const [filteredDocuments, setFilteredDocuments] = useState<IKnowlageBase[]>([]);
 
-  const filteredDocuments = knowlageBase.filter(
-    doc =>
-      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentDocuments, setCurrentDocuments] = useState<IKnowlageBase[]>([]);
 
-  const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentDocuments = filteredDocuments.slice(startIndex, endIndex);
+  useEffect(() => {
+    if (filteredDocuments.length > 0) {
+      const pages = Math.ceil(filteredDocuments.length / itemsPerPage);
+      setTotalPages(pages);
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      setCurrentDocuments(filteredDocuments.slice(startIndex, endIndex));
+    }
+  }, [filteredDocuments, currentPage, itemsPerPage]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -102,36 +105,36 @@ export default function KnowlageBase() {
     }
   };
 
-  const handleRefresh = async () => {
+  const getDocs = async () => {
+    setIsRefreshing(true);
     try {
-      setIsRefreshing(true);
-      // Здесь логика обновления данных
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // const response = await fetch('/api/refresh-npa');
-      // const data = await response.json();
+      const data = await NpaService.getNpa();
+      setKnowlageBase(data as unknown as IKnowlageBase[]);
     } catch (error) {
-      console.error("Ошибка обновления:", error);
+      console.error("Ошибка при получении документов:", error);
     } finally {
       setIsRefreshing(false);
     }
   };
 
+  const handleRefresh = async () => {
+    getDocs();
+  };
+
   const onSubmit = (values: FormValues) => {
     setRequestSend(true);
-    console.log(values);
-    // fetch("/api/search-npa", {
-    //   method: "POST",
-    //   body: JSON.stringify(values),
-    // })
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     console.log(data);
-    //     setKnowlageBase(data);
-    //   });
+    try {
+      const response = NpaService.getNpaByTheme(values.query);
+      console.log(response);
+    } catch (error) {
+      console.error("Ошибка при получении документов:", error);
+    } finally {
+      setRequestSend(false);
+    }
   };
 
   useEffect(() => {
-    setKnowlageBase(knowlageBaseData);
+    getDocs();
     const intervalId = setInterval(() => {
       handleRefresh();
     }, 30000);
@@ -140,6 +143,20 @@ export default function KnowlageBase() {
       clearInterval(intervalId);
     };
   }, []);
+
+  useEffect(() => {
+    if (knowlageBase && knowlageBase.length !== 0) {
+      const filtered = knowlageBase.filter(doc => {
+        const title = doc.title?.toLowerCase() || "";
+        const description = doc.description?.toLowerCase() || "";
+        return (
+          title.includes(searchQuery.toLowerCase()) ||
+          description.includes(searchQuery.toLowerCase())
+        );
+      });
+      setFilteredDocuments(filtered);
+    }
+  }, [searchQuery, knowlageBase]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -276,29 +293,29 @@ export default function KnowlageBase() {
                       <td className="py-3 px-4">
                         <div>
                           <div className="font-medium text-foreground">{doc.title}</div>
-                          <div className="text-sm text-muted-foreground">{doc.description}</div>
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-muted-foreground">{doc.lastUpdated}</td>
+                      <td className="py-3 px-4 text-muted-foreground">
+                        {doc.lastUpdated.substring(0, 10)}
+                      </td>
                       <td className="py-3 px-4">
                         <Badge
-                          variant={doc.status === "Активный" ? "default" : "secondary"}
+                          variant={true ? "default" : "secondary"}
                           className={
-                            doc.status === "Активный"
-                              ? "bg-green-500"
-                              : "bg-muted text-muted-foreground"
+                            true ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
                           }
                         >
-                          {doc.status}
+                          Активный
                         </Badge>
                       </td>
                       <td className="py-3 px-4 text-right">
                         <Link
-                          to={doc.link}
+                          to={doc.filePath}
                           target="_blank"
+                          download={doc.filePath}
                           className="text-primary hover:bg-primary/10 px-4 py-2 rounded-md"
                         >
-                          Просмотр
+                          Загрузить
                         </Link>
                       </td>
                     </tr>

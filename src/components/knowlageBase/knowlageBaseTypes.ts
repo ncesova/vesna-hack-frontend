@@ -2,7 +2,7 @@ export interface IKnowlageBase {
   id: string;
   title: string;
   description: string;
-  link: string;
+  filePath: string;
   lastUpdated: string;
   status: string;
 }

@@ -26,7 +26,7 @@ export default function MyDocuments() {
 
   const { data, isLoading, refetch } = useGetDocuments({
     search: searchQuery,
-    size: itemsPerPage,
+    size: 1000,
     page: currentPage, // 1-based index
   });
 
