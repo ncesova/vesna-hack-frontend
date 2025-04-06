@@ -282,9 +282,9 @@ export default function KnowlageBase() {
                     <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                       Статус
                     </th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                    {/* <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
                       Действия
-                    </th>
+                    </th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -308,7 +308,7 @@ export default function KnowlageBase() {
                           Активный
                         </Badge>
                       </td>
-                      <td className="py-3 px-4 text-right">
+                      {/* <td className="py-3 px-4 text-right">
                         <Link
                           to={doc.filePath}
                           target="_blank"
@@ -317,7 +317,7 @@ export default function KnowlageBase() {
                         >
                           Загрузить
                         </Link>
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>
