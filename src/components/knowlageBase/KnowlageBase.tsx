@@ -118,6 +118,7 @@ export default function KnowlageBase() {
 
   const onSubmit = (values: FormValues) => {
     setRequestSend(true);
+    console.log(values);
     // fetch("/api/search-npa", {
     //   method: "POST",
     //   body: JSON.stringify(values),
