@@ -35,6 +35,7 @@ export interface DocumentAnalysBusiness {
   documentId: string | null;
   analyses: Analys[] | null;
   npas: NpaBusiness[] | null;
+  text: string | null;
 }
 
 export interface Analys {
@@ -42,6 +43,8 @@ export interface Analys {
   text: string | null;
   explanation: string | null;
   regulation: string | null;
+  bgColor?: string;
+  borderColor?: string;
 }
 
 export interface NpaBusiness {
